@@ -1,0 +1,14 @@
+name: TPU Test
+run-name: ${{ github.actor }} is testing self-hosted runners on TPUs
+on: [push]
+jobs:
+  tpu-test:
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install expecttest
+      - run: python3 /src/pytorch/xla/test/test_operations.py -v
+
