@@ -10,5 +10,5 @@ jobs:
         with:
           python-version: '3.10'
       - run: pip install expecttest
-      - run: python3 /src/pytorch/xla/test/test_operations.py -v
-
+      - run: pwd
+      - run: python3 xla/test/test_operations.py -v
