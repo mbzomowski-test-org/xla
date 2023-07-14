@@ -9,7 +9,5 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-      - run: pip3 install torch~=2.0.0 https://storage.googleapis.com/tpu-pytorch/wheels/tpuvm/torch_xla-2.0-cp38-cp38-linux_x86_64.whl
-      - run: pip3 install expecttest numpy pyyaml torch_xla[tpuvm]
       - run: pwd
       - run: python3 test/test_operations.py -v
