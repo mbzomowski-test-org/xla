@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: r2.1
+          ref: r2.0
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
