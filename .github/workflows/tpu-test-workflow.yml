@@ -10,5 +10,6 @@ jobs:
         with:
           python-version: '3.8'
       - run: pwd
+      - run: pip3 install numpy
       - run: python3 test/test_operations.py -v
 #test comment
