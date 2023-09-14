@@ -5,7 +5,7 @@ jobs:
   tpu-test:
     runs-on: [self-hosted, Linux, X64]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@r2.0
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
