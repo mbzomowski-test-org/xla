@@ -40,6 +40,7 @@ def _setup_default_env():
   _set_missing_env('GRPC_VERBOSITY', 'ERROR')
   _set_missing_env('ALLOW_MULTIPLE_LIBTPU_LOAD', '1')
   _set_missing_env('TPU_ML_PLATFORM', 'PyTorch/XLA')
+  _set_missing_env('TPU_MEGACORE', 'megacore_dense')
 
 
 _fd, _tmp_fname = -1, ''
@@ -58,6 +59,15 @@ def _summarize_fn_tracker():
   process_frames(_tmp_fname)
   os.close(_fd)
   os.remove(_tmp_fname)
+
+
+def _aws_ec2_inf_trn_init():
+  try:
+    from torch_neuronx import xla
+  except ImportError:
+    return
+  else:
+    xla.init()
 
 
 def _setup_tpu_vm_library_path() -> bool:
@@ -101,14 +111,12 @@ import torch
 from ._patched_functions import _apply_patches
 from .version import __version__
 
-logger.info(
-    'Letting libtpu.so load fail during _XLAC import. libtpu.so will be loaded '
-    'from `libtpu` Python package when the ComputationClient is created.')
-os.environ['TPU_LOAD_LIBRARY'] = '0'
 import _XLAC
-del os.environ['TPU_LOAD_LIBRARY']
 
 _found_libtpu = _setup_tpu_vm_library_path()
+
+# Setup Neuron library for AWS EC2 inf/trn instances.
+_aws_ec2_inf_trn_init()
 
 
 def _prepare_to_exit():
@@ -131,3 +139,5 @@ _init_xla_lazy_backend()
 # keep PyTorch/XLA CI healthy.
 # TODO @wonjoo come up with a long term fix in Dynamo.
 torch._dynamo.config.automatic_dynamic_shapes = False
+
+from .stablehlo import save_as_stablehlo, save_torch_model_as_stablehlo

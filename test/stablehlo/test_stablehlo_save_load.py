@@ -1,6 +1,10 @@
+import tempfile
 import torch_xla
 import torch_xla.core.xla_model as xm
+from torch_xla import save_torch_model_as_stablehlo, save_as_stablehlo
+from torch_xla.stablehlo import StableHLOExportOptions, StableHLOGraphModule
 import torch
+import torch._export
 import torchvision
 import unittest
 from torch import nn
@@ -83,6 +87,38 @@ class SimpleExportTest(unittest.TestCase):
     stablehlo = self.export_stable_hlo(model, inputs, kwargs)
     # FIXME: Currently the dim=1 is hard coded
     self.assertTrue('dim = 1' in stablehlo)
+
+  def test_save_load(self):
+    model = ElementwiseAdd()
+    inputs = model.get_random_inputs()
+    exported = torch._export.export(model, inputs)
+    options = StableHLOExportOptions()
+    options.override_tracing_arguments = inputs
+    with tempfile.TemporaryDirectory() as tempdir:
+      save_as_stablehlo(exported, tempdir, options)
+      program2 = StableHLOGraphModule.load(tempdir)
+    result = program2(*inputs).detach().cpu()
+    self.assertTrue(torch.allclose(model(*inputs), result))
+
+  def test_save_load2(self):
+    model = ElementwiseAdd()
+    inputs = model.get_random_inputs()
+    with tempfile.TemporaryDirectory() as tempdir:
+      save_torch_model_as_stablehlo(model, inputs, tempdir)
+      program2 = StableHLOGraphModule.load(tempdir)
+      result = program2(*inputs).detach().cpu()
+    self.assertTrue(torch.allclose(model(*inputs), result))
+
+  def test_save_load3(self):
+    model = ElementwiseAdd()
+    inputs = model.get_random_inputs()
+    exported = torch._export.export(model, inputs)
+    with tempfile.TemporaryDirectory() as tempdir:
+      # Shouldnt need specify options because exported has example_input inside
+      save_as_stablehlo(exported, tempdir)
+      program2 = StableHLOGraphModule.load(tempdir)
+    result = program2(*inputs).detach().cpu()
+    self.assertTrue(torch.allclose(model(*inputs), result))
 
 
 if __name__ == '__main__':

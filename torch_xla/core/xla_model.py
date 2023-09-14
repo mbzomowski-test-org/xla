@@ -71,7 +71,7 @@ def is_xla_tensor(tensor):
 
 
 def parse_xla_device(device):
-  m = re.match(r'(CPU|TPU|GPU|XPU):(\d+)$', device)
+  m = re.match(r'(CPU|TPU|GPU|XPU|NEURON):(\d+)$', device)
   if m:
     return (m.group(1), int(m.group(2)))
 
@@ -80,8 +80,8 @@ def get_xla_supported_devices(devkind=None, max_devices=None):
   """Returns a list of supported devices of a given kind.
 
   Args:
-    devkind (string..., optional): If specified, one of `TPU`, `GPU`, `XPU` or `CPU`
-      (the 'GPU' XLA device is currently not implemented).
+    devkind (string..., optional): If specified, one of `TPU`, `GPU`, `XPU`, 
+      `NEURON` or `CPU` (the 'GPU' XLA device is currently not implemented).
     max_devices (int, optional): The maximum number of devices to be returned of
       that kind.
 
@@ -89,7 +89,7 @@ def get_xla_supported_devices(devkind=None, max_devices=None):
     The list of device strings.
   """
   xla_devices = _DEVICES.value
-  devkind = [devkind] if devkind else ['TPU', 'GPU', 'XPU', 'CPU']
+  devkind = [devkind] if devkind else ['TPU', 'GPU', 'XPU', 'NEURON', 'CPU']
   for kind in devkind:
     kind_devices = []
     for i, device in enumerate(xla_devices):
@@ -181,7 +181,8 @@ def xla_device(n=None, devkind=None):
     n (int, optional): The specific instance (ordinal) to be returned. If
       specified, the specific XLA device instance will be returned. Otherwise
       the first device of `devkind` will be returned.
-    devkind (string..., optional): If specified, one of `TPU`, `GPU`, `XPU` or `CPU`.
+    devkind (string..., optional): If specified, one of `TPU`, `GPU`, `XPU` 
+      `NEURON` or `CPU`.
 
   Returns:
     A `torch.device` with the requested instance.
@@ -216,8 +217,8 @@ def xla_device_hw(device):
       real device.
 
   Returns:
-    A string representation of the hardware type (`CPU`, `TPU`, `XPU`, `GPU`) of the
-    given device.
+    A string representation of the hardware type (`CPU`, `TPU`, `XPU`, `NEURON`, `GPU`) 
+    of the given device.
   """
   real_device = _xla_real_device(device)
   return real_device.split(':')[0]
@@ -449,6 +450,15 @@ def all_reduce(reduce_type, inputs, scale=1.0, groups=None, pin_layout=True):
     returns the list/tuple itself.
   """
   groups = groups or []
+
+  # No-op if there is only one device
+  if xrt_world_size() == 1 and not xu.getenv_as('XLA_ALWAYS_ALLREDUCE', bool,
+                                                False):
+    if isinstance(inputs, torch.Tensor):
+      return inputs.clone()
+    else:
+      return inputs
+
   if isinstance(inputs, torch.Tensor):
     result = None
     if scale == 1.0 and groups == [] and pin_layout:
@@ -533,9 +543,9 @@ def all_gather(value, dim=0, groups=None, output=None, pin_layout=True):
     A tensor which has, in the ``dim`` dimension, all the values from the
     participating replicas.
   """
-  if pin_layout and output == None:
-    # There is not an easy way to pin the all_gather layout on TPU and GPU, use
-    # all_reduce based all_gather for this purpose.
+  if pin_layout and (output == None or xla_device_hw(value.device) == 'NEURON'):
+    # There is not an easy way to pin the all_gather layout on TPU, GPU and NEURON,
+    # use all_reduce based all_gather for this purpose.
     return _all_gather_using_all_reduce(
         value, dim=dim, groups=groups, pin_layout=True)
 
@@ -653,7 +663,7 @@ def collective_broadcast(tensors: List[torch.Tensor],
           1 if get_ordinal() == root_ordinal else 0, dtype=tensor.dtype)
       # Transfer scale tensor as device data instead of constant 1 or 0.
       xscale = send_cpu_data_to_device(scale, tensor.device)
-      tensor.mul_(xscale)
+      tensor.mul_(xscale[0])
 
   all_reduce(REDUCE_SUM, tensors, groups=groups, pin_layout=pin_layout)
 
@@ -986,7 +996,7 @@ def _maybe_convert_to_cpu(data, convert=True):
   return ToXlaTensorArena(convert_fn, select_fn).transform(data)
 
 
-def send_cpu_data_to_device(data, device, input_sharding=None):
+def send_cpu_data_to_device(datas, device, input_sharding=None):
 
   def convert_fn(tensors):
     devices = [str(device)] * len(tensors)
@@ -1000,7 +1010,9 @@ def send_cpu_data_to_device(data, device, input_sharding=None):
   def select_fn(v):
     return type(v) == torch.Tensor and v.device.type == 'cpu'
 
-  return ToXlaTensorArena(convert_fn, select_fn).transform(data)
+  if type(datas) is torch.Tensor:
+    datas = [datas]
+  return ToXlaTensorArena(convert_fn, select_fn).transform(datas)
 
 
 def xla_rendezvous(payload: bytes = b'',
