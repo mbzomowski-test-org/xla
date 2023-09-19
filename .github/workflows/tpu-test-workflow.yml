@@ -11,7 +11,6 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-      - run: pwd
       - run: pip install numpy
       - run: pip install pyyaml
       - run: pip install torchvision
