@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is testing self-hosted runners on TPUs
 on: [push]
 jobs:
   tpu-test:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: arc-runner-set
     steps:
       - uses: actions/checkout@v4
         with:
