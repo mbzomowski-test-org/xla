@@ -51,3 +51,13 @@ resource "kubernetes_manifest" "flux-terraform" {
   ]
 }
 
+resource "kubernetes_config_map" "configmap" {
+  metadata {
+    name = "branch-planner"
+    namespace = "flux-system"
+  }
+
+  data = {
+    "configmap.yaml" = "${file("${path.module}/configmap.yaml")}"
+  }
+}
