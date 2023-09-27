@@ -41,7 +41,7 @@ resource "kubernetes_manifest" "flux-terraform" {
       "interval" = "1m"
       "sourceRef" = {
         "kind" = "GitRepository"
-        "name" = "flux-repo"
+        "name" = "source-repo"
         "namespace" = var.flux_namespace
       }
     }

@@ -1,6 +1,14 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
+variable "project_id" {
+  default = "tpu-pytorch"
+}
+
+variable "region" {
+  default = "us-central2"
+}
+
 variable "gke_username" {
   default     = ""
   description = "gke username"
