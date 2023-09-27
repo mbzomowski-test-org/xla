@@ -15,3 +15,18 @@ resource "kubernetes_secret" "github-pat" {
     github_token = var.GITHUB_TOKEN
   }
 }
+
+resource "kubernetes_secret" "github-pat-flux" {
+  metadata {
+    name = "github-pat"
+    namespace = "flux-system"
+  }
+  depends_on = [
+    helm_release.arc-runner-set
+  ]
+
+  data = {
+    github_token = var.GITHUB_TOKEN
+  }
+}
+
