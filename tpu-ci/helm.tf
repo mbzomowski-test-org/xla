@@ -58,6 +58,7 @@ resource "helm_release" "tf-controller" {
   depends_on = [
     helm_release.flux
   ]
+  version = ">=0.16.0-rc.2"
   values = [
     "${file("tf-controller-values.yaml")}"
   ]
