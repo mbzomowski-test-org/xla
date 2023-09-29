@@ -10,13 +10,9 @@ resources:
 caCertValidityDuration: 24h
 certRotationCheckFrequency: 30m
 image:
-  tag: v0.16.0-rc.2
+  tag: v0.16.0-rc.3
 runner:
   image:
-    tag: v0.16.0-rc.2
+    tag: v0.16.0-rc.3
   grpc:
     maxMessageSize: 30
-branchPlanner:
-  enabled: true
-  image:
-    tag: v0.16.0-rc.2

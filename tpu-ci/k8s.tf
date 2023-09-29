@@ -50,14 +50,3 @@ resource "kubernetes_manifest" "flux-terraform" {
     helm_release.tf-controller
   ]
 }
-
-resource "kubernetes_config_map" "configmap" {
-  metadata {
-    name = "branch-planner"
-    namespace = "flux-system"
-  }
-
-  data = {
-    "configmap.yaml" = "${file("${path.module}/configmap.yaml")}"
-  }
-}
