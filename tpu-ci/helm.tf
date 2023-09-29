@@ -52,13 +52,13 @@ resource "helm_release" "flux" {
 
 resource "helm_release" "tf-controller" {
   name = "tf-controller"
-  repository = "https://weaveworks.github.io/tf-controller/"
+  repository = "oci://ghcr.io/weaveworks/charts"
   chart = "tf-controller"
   namespace = var.flux_namespace
   depends_on = [
     helm_release.flux
   ]
-  version = ">=0.16.0-rc.2"
+  version = "0.16.0-rc.3"
   values = [
     "${file("tf-controller-values.yaml")}"
   ]
