@@ -1,8 +1,13 @@
 data "google_client_config" "provider" {}
 
+data "google_container_cluster" "primary" {
+  name = "bzmarke-tpu-cluster"
+  location = var.region
+}
+
 provider "kubernetes" {
-  host                   = "https://${google_container_cluster.primary.endpoint}"
-  cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth.0.cluster_ca_certificate)
+  host                   = "https://${data.google_container_cluster.primary.endpoint}"
+  cluster_ca_certificate = base64decode(data.google_container_cluster.primary.master_auth.0.cluster_ca_certificate)
   token = data.google_client_config.provider.access_token
 }
 
@@ -45,6 +50,16 @@ resource "kubernetes_manifest" "flux-terraform" {
         "kind" = "GitRepository"
         "name" = "source-repo"
         "namespace" = var.flux_namespace
+      }
+      "runnerPodTemplate" = {
+        "spec" = {
+          "env" = [
+            {
+              "name" = "TF_VAR"
+              "value" = "DEBUG"
+            }
+          ]
+        }
       }
     }
   }
