@@ -51,3 +51,31 @@ resource "kubernetes_manifest" "flux-terraform" {
     helm_release.tf-controller
   ]
 }
+
+resource "kubernetes_cluster_role" "role" {
+  metadata {
+    name = "tf-role"
+  }
+  rule {
+    api_groups = ["apiextensions.k8s.io"]
+    resources = ["customresourcedefinitions"]
+    verbs = ["list"]
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "rolebinding" {
+  metadata {
+    name = "tf-role-binding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = "tf-role"
+  }
+
+  subject {
+    kind = "User"
+    name = "system:serviceaccount:flux-system:tf-runner"
+    api_group = "rbac.authorization.k8s.io"
+  }
+}
