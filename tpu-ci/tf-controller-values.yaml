@@ -16,3 +16,6 @@ runner:
     tag: v0.16.0-rc.3
   grpc:
     maxMessageSize: 30
+extraEnv:
+  - name: TF_LOG
+    value: debug
