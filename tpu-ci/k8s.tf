@@ -46,6 +46,16 @@ resource "kubernetes_manifest" "flux-terraform" {
         "name" = "source-repo"
         "namespace" = var.flux_namespace
       }
+      "runnerPodTemplate" = {
+        "spec" = {
+          "env" = [
+            {
+              "name" = "TF_VAR"
+              "value" = "DEBUG"
+            }
+          ]
+        }
+      }
     }
   }
   depends_on = [
