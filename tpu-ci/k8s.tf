@@ -25,7 +25,6 @@ resource "kubernetes_manifest" "flux-repo" {
       "ref" = {
         "branch" = "master"
       }
-      "ignore" = "secret.tf"
     }
   }
 
