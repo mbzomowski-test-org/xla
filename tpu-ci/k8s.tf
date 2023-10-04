@@ -59,6 +59,13 @@ resource "kubernetes_manifest" "flux-terraform" {
           }
         }
       }
+      "backendConfig" = {
+        "customConfiguration" = <<EOT
+          backend "gcs" {
+            bucket = "bzmarke-tfstate"
+            prefix = "terraform/state"
+EOT
+      }
     }
   }
   depends_on = [
