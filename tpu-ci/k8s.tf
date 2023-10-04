@@ -51,14 +51,12 @@ resource "kubernetes_manifest" "flux-terraform" {
         "name" = "source-repo"
         "namespace" = var.flux_namespace
       }
+      "serviceAccountName" = google_service_account.gsa.name
       "runnerPodTemplate" = {
         "spec" = {
-          "env" = [
-            {
-              "name" = "TF_VAR"
-              "value" = "DEBUG"
-            }
-          ]
+          "nodeSelector" = {
+            "iam.gke.io/gke-metadata-server-enabled" = "true"
+          }
         }
       }
     }
@@ -95,3 +93,15 @@ resource "kubernetes_cluster_role_binding" "rolebinding" {
     api_group = "rbac.authorization.k8s.io"
   }
 }
+
+resource "kubernetes_service_account" "ksa" {
+  metadata {
+    name = "tf-ksa"
+    namespace = var.flux_namespace
+    annotations = {
+      "iam.gke.io/gcp-service-account" = "${google_service_account.gsa.account_id}@${var.project_id}.iam.gserviceaccount.com"
+    }
+  }
+}
+
+

@@ -30,3 +30,13 @@ resource "kubernetes_secret" "github-pat-flux" {
   }
 }
 
+/*
+resource "kubernetes_secret" "tf-sa" {
+  metadata {
+    name = "tf-sa"
+    namespace = "flux-system"
+  }
+  data = {
+    
+  }
+}*/

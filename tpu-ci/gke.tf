@@ -55,6 +55,10 @@ resource "google_container_cluster" "primary" {
   }
 
   min_master_version = 1.28
+
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
 }
 
 # Separately Managed Node Pool
@@ -78,6 +82,9 @@ resource "google_container_node_pool" "primary_nodes" {
     tags         = ["gke-node", "bzmarke-tpu-test"]
     metadata = {
       disable-legacy-endpoints = "true"
+    }
+    workload_metadata_config {
+      mode = "GKE_METADATA"
     }
   }
 
@@ -125,3 +132,20 @@ resource "google_container_node_pool" "tpu_nodes" {
     auto_repair = true
   }
 }
+
+resource "google_service_account" "gsa" {
+  account_id = "gsa-bzmarke"
+}
+
+resource "google_project_iam_member" "gsa-binding" {
+  project = var.project_id
+  role = "roles/owner"
+  member = "serviceAccount:${google_service_account.gsa.account_id}@${var.project_id}.iam.gserviceaccount.com"
+}
+
+resource "google_service_account_iam_member" "ksa-binding" {
+  service_account_id = google_service_account.gsa.name
+  role = "roles/iam.workloadIdentityUser"
+  member = "serviceAccount:${var.project_id}.svc.id.goog[${var.flux_namespace}/${kubernetes_service_account.ksa.metadata[0].name}]"
+}
+
