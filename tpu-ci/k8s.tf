@@ -64,6 +64,7 @@ resource "kubernetes_manifest" "flux-terraform" {
           backend "gcs" {
             bucket = "bzmarke-tfstate"
             prefix = "terraform/state"
+          }
 EOT
       }
     }
