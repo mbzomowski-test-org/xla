@@ -79,6 +79,7 @@ resource "kubernetes_service_account" "ksa" {
 resource "kubernetes_role" "role" {
   metadata {
     name = "ksa-role"
+    namespace = var.flux_namespace
   }
   rule {
     api_groups = [""]
