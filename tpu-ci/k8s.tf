@@ -51,7 +51,7 @@ resource "kubernetes_manifest" "flux-terraform" {
         "name" = "source-repo"
         "namespace" = var.flux_namespace
       }
-      "serviceAccountName" = kubernetes_service_account.ksa.name
+      "serviceAccountName" = kubernetes_service_account.ksa.metadata[0].name
       "runnerPodTemplate" = {
         "spec" = {
           "nodeSelector" = {
