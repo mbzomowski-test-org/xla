@@ -76,4 +76,30 @@ resource "kubernetes_service_account" "ksa" {
   }
 }
 
+resource "kubernetes_role" "role" {
+  metadata {
+    name = "ksa-role"
+  }
+  rule {
+    api_groups = [""]
+    resources = ["secrets"]
+    verbs = ["get", "list", "watch", "update", "create"]
+  }
+}
 
+resource "kubernetes_role_binding" "binding" {
+  metadata {
+    name = "ksa-role-binding"
+    namespace = var.flux_namespace
+  }
+  role_ref {
+    name = kubernetes_role.role.metadata[0].name
+    kind = "Role"
+    api_group = "rbac.authorization.k8s.io"
+  }
+  subject {
+    name = kubernetes_service_account.ksa.metadata[0].name
+    namespace = var.flux_namespace
+    kind = "ServiceAccount"
+  }
+}
