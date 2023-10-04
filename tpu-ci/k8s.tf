@@ -59,7 +59,6 @@ resource "kubernetes_manifest" "flux-terraform" {
           }
         }
       }
-      "refreshBeforeApply" = "true"
     }
   }
   depends_on = [
