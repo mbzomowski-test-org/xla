@@ -1,4 +1,4 @@
-replicaCount: 4
+replicaCount: 3
 concurrency: 24
 resources:
   limits:
