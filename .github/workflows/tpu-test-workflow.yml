@@ -19,7 +19,7 @@ jobs:
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/infra/ansible
           pwd
-          sudo ansible-playbook playbook.yaml -e "stage=build arch=amd64 accelerator=tpu"
+          sudo ansible-playbook playbook.yaml -e "stage=build arch=amd64 accelerator=tpu" --tags "bazel,configure_env,install_deps"
           cd ../../..
           pwd
           python3 setup.py install
