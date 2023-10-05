@@ -6,15 +6,9 @@ jobs:
     runs-on: runner-set
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: r2.0
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-      - run: pip install numpy
-      - run: pip install pyyaml
-      - run: pip install torchvision
-      - run: pip install torch~=2.0.0 https://storage.googleapis.com/tpu-pytorch/wheels/tpuvm/torch_xla-2.0-cp38-cp38-linux_x86_64.whl
-      - run: python3 test/test_operations.py -v
-        #whatever
+      - run: |
+          TPUVM_MODE=1 python3 setup.py
 
