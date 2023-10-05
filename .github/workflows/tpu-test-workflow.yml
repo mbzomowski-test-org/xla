@@ -5,7 +5,6 @@ jobs:
   tpu-test:
     runs-on: runner-set
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
@@ -14,6 +13,11 @@ jobs:
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
           git version
-          pip3 install torch torchvision
+          git clone --recursive https://github.com/pytorch/pytorch
+          cd pytorch/
+          git clone --recursive https://github.com/pytorch/xla.git
+          cd /pytorch/
+          python3 setup.py install
+          cd xla/
           TPUVM_MODE=1 python3 setup.py install
 
