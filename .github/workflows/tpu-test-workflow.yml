@@ -13,5 +13,5 @@ jobs:
           sudo apt-get update -y
           sudo apt-get upgrade -y
           pip3 install torch torchvision
-          TPUVM_MODE=1 python3 setup.py
+          TPUVM_MODE=1 python3 setup.py install
 
