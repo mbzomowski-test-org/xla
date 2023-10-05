@@ -13,13 +13,13 @@ jobs:
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
           git version
-          pip3 install cmake
+          pip3 install cmake pyyaml
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           pwd
+          python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
           pwd
-          python3 setup.py install
           cd xla/
           TPUVM_MODE=1 python3 setup.py install
 
