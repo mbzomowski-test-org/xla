@@ -7,19 +7,22 @@ jobs:
     steps:
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.8'
       - run: |
           sudo apt-get update -y
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
-          git version
-          pip3 install cmake pyyaml
+          pip3 install ansible
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           pwd
-          python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
+          cd xla/infra/ansible
           pwd
+          ansible-playbook playbook.yaml -e "stage=build arch=amd64 accelerator=tpu"
+          cd ../../..
+          pwd
+          python3 setup.py install
           cd xla/
           TPUVM_MODE=1 python3 setup.py install
 
