@@ -12,6 +12,8 @@ jobs:
       - run: |
           sudo apt-get update -y
           sudo apt-get upgrade -y
+          sudo apt-get install git-all
+          git version
           pip3 install torch torchvision
           TPUVM_MODE=1 python3 setup.py install
 
