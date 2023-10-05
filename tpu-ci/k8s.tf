@@ -25,7 +25,6 @@ resource "kubernetes_manifest" "flux-repo" {
       "ref" = {
         "branch" = "master"
       }
-      "ignore" = "secret.tf"
     }
   }
 
@@ -44,7 +43,6 @@ resource "kubernetes_manifest" "flux-terraform" {
     }
     "spec" = {
       "approvePlan" = "auto"
-      "destroy" = "false"
       "path" = "./tpu-ci/"
       "interval" = "1m"
       "sourceRef" = {
