@@ -1,0 +1,39 @@
+IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
+0c6a6fc5b86f   11 days ago   CMD ["entrypoint-dind.sh"]                      0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ENTRYPOINT ["/bin/bash" "-c"]                   0B        buildkit.dockerfile.v0
+<missing>      11 days ago   USER runner                                     0B        buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   107B      buildkit.dockerfile.v0
+<missing>      11 days ago   ENV ImageOS=ubuntu20                            0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ENV PATH=/usr/local/sbin:/usr/local/bin:/usr…   0B        buildkit.dockerfile.v0
+<missing>      11 days ago   VOLUME [/var/lib/docker]                        0B        buildkit.dockerfile.v0
+<missing>      11 days ago   COPY hooks /etc/arc/hooks/ # buildkit           634B      buildkit.dockerfile.v0
+<missing>      11 days ago   COPY docker-shim.sh /usr/local/bin/docker # …   464B      buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   0B        buildkit.dockerfile.v0
+<missing>      11 days ago   COPY entrypoint-dind.sh startup.sh logger.sh…   18.9kB    buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   47.7MB    buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   200MB     buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   7.7MB     buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache      0B        buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   399MB     buildkit.dockerfile.v0
+<missing>      11 days ago   ENV RUNNER_ASSETS_DIR=/runnertmp                0B        buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   63kB      buildkit.dockerfile.v0
+<missing>      11 days ago   ENV HOME=/home/runner                           0B        buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   335kB     buildkit.dockerfile.v0
+<missing>      11 days ago   RUN |9 TARGETPLATFORM=linux/amd64 RUNNER_VER…   483MB     buildkit.dockerfile.v0
+<missing>      11 days ago   ENV DEBIAN_FRONTEND=noninteractive              0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG DOCKER_GID=1001                             0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG RUNNER_UID=1000                             0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG DUMB_INIT_VERSION=1.2.5                     0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG DOCKER_COMPOSE_VERSION=v2.16.0              0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG DOCKER_VERSION=20.10.23                     0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG CHANNEL=stable                              0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG RUNNER_CONTAINER_HOOKS_VERSION              0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG RUNNER_VERSION                              0B        buildkit.dockerfile.v0
+<missing>      11 days ago   ARG TARGETPLATFORM                              0B        buildkit.dockerfile.v0
+<missing>      2 weeks ago   /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B        
+<missing>      2 weeks ago   /bin/sh -c #(nop) ADD file:12f97b7b044d0d116…   72.8MB    
+<missing>      2 weeks ago   /bin/sh -c #(nop)  LABEL org.opencontainers.…   0B        
+<missing>      2 weeks ago   /bin/sh -c #(nop)  LABEL org.opencontainers.…   0B        
+<missing>      2 weeks ago   /bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH     0B        
+<missing>      2 weeks ago   /bin/sh -c #(nop)  ARG RELEASE                  0B        

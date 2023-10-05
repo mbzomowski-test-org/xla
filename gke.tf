@@ -16,9 +16,11 @@ variable "gke_num_nodes" {
   description = "number of gke nodes"
 }
 
+data "google_client_config" "default" {}
+
 # GKE cluster
 resource "google_container_cluster" "primary" {
-  name     = "${var.project_id}-gke"
+  name     = "bzmarke-tpu-test"
   location = var.region
   
   # We can't create a cluster with no node pool defined, but we want to only use
@@ -33,7 +35,7 @@ resource "google_container_cluster" "primary" {
 
 # Separately Managed Node Pool
 resource "google_container_node_pool" "primary_nodes" {
-  name       = google_container_cluster.primary.name
+  name       = "default-pool"
   location   = var.region
   cluster    = google_container_cluster.primary.name
   node_count = var.gke_num_nodes
@@ -50,13 +52,46 @@ resource "google_container_node_pool" "primary_nodes" {
 
     # preemptible  = true
     machine_type = "n1-standard-1"
-    tags         = ["gke-node", "${var.project_id}-gke"]
+    tags         = ["gke-node", "bzmarke-tpu-test"]
     metadata = {
       disable-legacy-endpoints = "true"
     }
   }
 }
 
+resource "google_container_node_pool" "tpu_nodes" {
+  provider = google-beta
+  project = var.project_id
+  name = "bzmarke-pool"
+  location = var.region
+  cluster = google_container_cluster.primary.name
+  node_count = 1
+  node_locations = [
+    "us-central2-b",
+  ]
+
+  node_config {
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+    ]
+
+    labels = {
+      env = var.project_id
+    }
+
+    machine_type = "ct4p-hightpu-4t"
+    tags         = ["gke-node", "${var.project_id}-gke"]
+    metadata = {
+      disable-legacy-endpoints = "true"
+    }
+    service_account = "gke-alpha-svc-acct@tpu-pytorch.iam.gserviceaccount.com"
+  }
+  placement_policy {
+    type = "COMPACT"
+    tpu_topology = "2x2x1"
+  }
+}
 
 # # Kubernetes provider
 # # The Terraform Kubernetes Provider configuration below is used as a learning reference only. 

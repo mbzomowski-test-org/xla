@@ -1,0 +1,23 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: example-runnerdeploy
+spec:
+  replicas: 1
+  template:
+    spec:
+      nodeSelector:
+        cloud.google.com/gke-tpu-accelerator: tpu-v4-podslice
+        cloud.google.com/gke-tpu-topology: 2x2x1
+      repository: mbzomowski/xla
+      dockerdWithinRunnerContainer: true
+      containers:
+      - name: runner
+        image: summerwind/actions-runner-dind
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            google.com/tpu: 4
+          requests:
+            google.com/tpu: 4

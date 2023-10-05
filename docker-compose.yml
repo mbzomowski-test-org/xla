@@ -1,0 +1,5 @@
+services:
+  summerwind:
+    image: summerwind/actions-runner-dind
+  pytorch:
+    image: gcr.io/tpu-pytorch/xla:r2.0_3.8_tpuvm
