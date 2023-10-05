@@ -16,8 +16,7 @@ jobs:
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           git clone --recursive https://github.com/pytorch/xla.git
-          ls -al
-          cd pytorch/
+          pwd
           python3 setup.py install
           cd xla/
           TPUVM_MODE=1 python3 setup.py install
