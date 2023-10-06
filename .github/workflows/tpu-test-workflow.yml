@@ -12,7 +12,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
-          sudo ldconfig /home/runner/_work/_tool/Python/3.8.18/x64/lib
+          sudo apt-get install libpython3.8
           pip3 install ansible
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
@@ -20,7 +20,6 @@ jobs:
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/infra/ansible
           pwd
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
           echo $LD_LIBRARY_PATH
           echo $AGENT_TOOLSDIRECTORY
           echo $RUNNER_TOOL_CACHE
