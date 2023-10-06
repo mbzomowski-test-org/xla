@@ -6,8 +6,8 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
-          sudo apt-get update -y
           sudo apt-get install python3.8 python3-pip
+          sudo apt-get update -y
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
           pip3 install ansible
