@@ -5,14 +5,10 @@ jobs:
   tpu-test:
     runs-on: runner-set
     steps:
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
       - run: |
           sudo apt-get update -y
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
-          LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/runner/_work/_tool/Python/3.8.18/x64/lib 
           pip3 install ansible
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
