@@ -33,4 +33,8 @@ RUN curl -f -L -o runner-container-hooks.zip https://github.com/actions/runner-c
     && unzip ./runner-container-hooks.zip -d ./k8s \
     && rm runner-container-hooks.zip
 
+USER root
+
+RUN apt-get update && apt-get install -y sudo git-all
+
 USER runner
