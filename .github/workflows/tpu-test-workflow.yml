@@ -12,7 +12,7 @@ jobs:
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
           pip3 install ansible
-          PATH=$PATH:/home/runner/.local/bin
+          export PATH=$PATH:/home/runner/.local/bin
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           pwd
