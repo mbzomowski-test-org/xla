@@ -6,7 +6,7 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
-          sudo apt-get install python3.8
+          sudo apt-get install python3.8 -y
           sudo apt-get update -y
           sudo apt-get install python3-pip
           sudo apt-get upgrade -y
