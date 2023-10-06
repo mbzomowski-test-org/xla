@@ -6,25 +6,9 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
-          sudo apt-get install python3.8 -y
-          sudo apt-get update -y
-          sudo apt-get install python3-pip -y
-          sudo apt-get upgrade -y
-          sudo apt-get install git-all -y
-          pip3 install ansible
-          export PATH=$PATH:/home/runner/.local/bin
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          pwd
           git clone --recursive https://github.com/pytorch/xla.git
-          cd xla/infra/ansible
-          pwd
-          echo $LD_LIBRARY_PATH
-          echo $AGENT_TOOLSDIRECTORY
-          echo $RUNNER_TOOL_CACHE
-          sudo ansible-playbook playbook.yaml -e "stage=build arch=amd64 accelerator=tpu" --tags "bazel,configure_env,install_deps"
-          cd ../../..
-          pwd
           python3 setup.py install
           cd xla/
           python3 setup.py install
