@@ -6,9 +6,10 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
+          sudo apt-get install git-all -y
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          git clone --recursive https://github.com/pytorch/xla.git
           python3 setup.py install
+          git clone --recursive https://github.com/pytorch/xla.git
           cd xla/
           python3 setup.py install
