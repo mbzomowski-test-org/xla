@@ -20,6 +20,9 @@ jobs:
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/infra/ansible
           pwd
+          echo $LD_LIBRARY_PATH
+          echo $AGENT_TOOLSDIRECTORY
+          echo $RUNNER_TOOL_CACHE
           sudo ansible-playbook playbook.yaml -e "stage=build arch=amd64 accelerator=tpu" --tags "bazel,configure_env,install_deps"
           cd ../../..
           pwd
