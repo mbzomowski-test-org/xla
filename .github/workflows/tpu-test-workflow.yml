@@ -11,7 +11,6 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get upgrade -y
-          sleep infinity
           sudo apt-get install git-all -y
           pip3 install ansible
           git clone --recursive https://github.com/pytorch/pytorch
@@ -26,4 +25,3 @@ jobs:
           python3 setup.py install
           cd xla/
           python3 setup.py install
-
