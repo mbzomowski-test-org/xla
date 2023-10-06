@@ -38,4 +38,6 @@ USER root
 RUN apt-get update
 RUN echo "y" | apt-get install -y sudo
 
+RUN usermod -aG sudo runner
+
 USER runner
