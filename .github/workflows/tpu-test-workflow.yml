@@ -13,18 +13,18 @@ jobs:
           sudo apt-get upgrade -y
           sleep infinity
 
-          # sudo apt-get install git-all -y
-          # pip3 install ansible
-          # git clone --recursive https://github.com/pytorch/pytorch
-          # cd pytorch/
-          # pwd
-          # git clone --recursive https://github.com/pytorch/xla.git
-          # cd xla/infra/ansible
-          # pwd
-          #sudo ansible-playbook playbook.yaml -e "stage=build arch=amd64 accelerator=tpu" --tags "bazel,configure_env,install_deps"
-          #cd ../../..
-          #pwd
-          #python3 setup.py install
-          #cd xla/
-          #python3 setup.py install
+          sudo apt-get install git-all -y
+          pip3 install ansible
+          git clone --recursive https://github.com/pytorch/pytorch
+          cd pytorch/
+          pwd
+          git clone --recursive https://github.com/pytorch/xla.git
+          cd xla/infra/ansible
+          pwd
+          sudo ansible-playbook playbook.yaml -e "stage=build arch=amd64 accelerator=tpu" --tags "bazel,configure_env,install_deps"
+          cd ../../..
+          pwd
+          python3 setup.py install
+          cd xla/
+          python3 setup.py install
 
