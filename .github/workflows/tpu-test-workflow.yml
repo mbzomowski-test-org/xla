@@ -8,12 +8,11 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-      - env:
-          RUNNER_TOOL_CACHE: $RUNNER_TOOL_CACHE:/home/runner/_work/_tool/Python/3.8.18/x64/lib
-        run: |
+      - run: |
           sudo apt-get update -y
           sudo apt-get upgrade -y
           sudo apt-get install git-all -y
+          sudo ldconfig /home/runner/_work/_tool/Python/3.8.18/x64/lib
           pip3 install ansible
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
@@ -21,6 +20,7 @@ jobs:
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/infra/ansible
           pwd
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
           echo $LD_LIBRARY_PATH
           echo $AGENT_TOOLSDIRECTORY
           echo $RUNNER_TOOL_CACHE
