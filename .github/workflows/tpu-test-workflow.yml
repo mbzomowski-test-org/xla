@@ -6,6 +6,7 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
+          sudo apt-get upgrade -y
           sudo apt-get install -y git-all
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
