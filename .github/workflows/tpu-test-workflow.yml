@@ -6,12 +6,11 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
-          sudo apt-get install emacs -y
           sudo apt-get upgrade -y
-          sudo apt-get install -y git-all
+          sudo apt-get update -y
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          python3 setup.py install
+          sudo python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/
-          python3 setup.py install
+          sudo python3 setup.py install
