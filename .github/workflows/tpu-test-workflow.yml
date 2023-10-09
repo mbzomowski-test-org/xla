@@ -15,6 +15,5 @@ jobs:
           sudo python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/
-          pip3 install torch_xla[tpu] -f https://storage.googleapis.com/libtpu-releases/index.html
-          sudo python3 setup.py install
+          BUNDLE_LIBTPU=1 TPUVM_MODE=1 sudo python3 setup.py install
           python3 test/test_operations.py -v
