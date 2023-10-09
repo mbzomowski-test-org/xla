@@ -5,7 +5,9 @@ jobs:
   tpu-test:
     runs-on: runner-set
     steps:
-      - run: |
+      - env:
+          PJRT_DEVICE: TPU
+        run: |
           sudo apt-get upgrade -y
           sudo apt-get update -y
           git clone --recursive https://github.com/pytorch/pytorch
@@ -13,5 +15,5 @@ jobs:
           sudo python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/
-          TPUVM_MODE=1 sudo python3 setup.py install
+          sudo python3 setup.py install
           python3 test/test_operations.py -v
