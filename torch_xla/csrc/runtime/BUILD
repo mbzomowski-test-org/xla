@@ -51,6 +51,9 @@ cc_library(
   hdrs = [
     "computation_client.h",
   ],
+  copts = [
+    "-isystemexternal/torch",
+  ],
   deps = [
     ":debug_macros",
     ":env_vars",
@@ -60,13 +63,17 @@ cc_library(
     ":sys_util",
     ":types",
     ":util",
+    "//torch_xla/csrc:device",
     "@tsl//tsl/platform:stacktrace_handler",
     "@xla//xla:literal_util",
     "@xla//xla/client:xla_computation",
+    "@xla//xla/hlo/ir:hlo",
     "@com_google_absl//absl/memory",
     "@com_google_absl//absl/strings",
     "@com_google_absl//absl/types:optional",
     "@com_google_absl//absl/types:span",
+    "@torch//:headers",
+    "@torch//:runtime_headers",
   ],
 )
 
@@ -92,7 +99,6 @@ cc_library(
     "@xla//xla/pjrt/distributed",
     "@xla//xla/pjrt/gpu:se_gpu_pjrt_client",
     "@xla//xla/service:gpu_plugin",
-    "@xla//xla/pjrt:tpu_client",
     "@xla//xla/pjrt:pjrt_client",
     "@xla//xla/pjrt:tfrt_cpu_pjrt_client",
     "@xla//xla/pjrt:pjrt_c_api_client",

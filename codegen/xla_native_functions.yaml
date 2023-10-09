@@ -12,6 +12,8 @@ full_codegen:
   - amin
   - any
   - any.dim
+  - argmax
+  - argmin
   - asin
   - asinh
   - atan
@@ -61,8 +63,11 @@ full_codegen:
   - log_sigmoid_forward
   - lt.Scalar
   - lt.Tensor
+  - masked_fill.Scalar
+  - masked_fill.Tensor
   - maximum
   - minimum
+  - native_dropout_backward
   - ne.Scalar
   - ne.Tensor
   - reciprocal
@@ -132,8 +137,6 @@ supported:
   - addmm
   - alias_copy
   - arange.start_out
-  - argmax
-  - argmin
   - as_strided_copy
   - as_strided_scatter
   - atan2
@@ -216,8 +219,6 @@ supported:
   - log2
   - log10
   - logsumexp
-  - masked_fill.Scalar
-  - masked_fill.Tensor
   - masked_scatter
   - masked_select
   - max
@@ -246,6 +247,7 @@ supported:
   - nan_to_num
   - native_batch_norm
   - native_batch_norm_backward
+  - native_dropout
   - neg
   - nll_loss2d_backward
   - nll_loss2d_forward

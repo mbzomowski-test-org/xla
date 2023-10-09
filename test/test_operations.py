@@ -1646,6 +1646,29 @@ class TestAtenXlaTensor(test_utils.XlaTestCase):
         for dtype in (torch.long, torch.int32, torch.bool)
     ], test_fn)
 
+  def test_native_dropout_backward(self):
+
+    def test_fn(input):
+      dropped = torch.native_dropout(input, 0.5, train=True)
+      loss = dropped[0] + 0.5
+      loss.mean().backward()
+      return dropped[1].cpu(), input.grad.cpu()
+
+    met.clear_all()
+    xla_device = xm.xla_device()
+    input_cpu = torch.randn(7, 7, requires_grad=True)
+    input_xla = torch.randn(7, 7, device=xla_device, requires_grad=True)
+    mask_cpu, grad_cpu = test_fn(input_cpu)
+    mask_xla, grad_xla = test_fn(input_xla)
+    # dropout is random, hence we construct the expected grad_xla by mask_xla
+    # and gradient_cpu.
+    grad_cpu_single = grad_cpu[mask_cpu][0]
+    torch.allclose(
+        grad_cpu_single * mask_xla.to(torch.float), grad_xla, rtol=1e-03)
+
+    self.assertIn("xla::native_dropout_backward", met.counter_names())
+    self.assertNotIn("aten::native_dropout_backward", met.counter_names())
+
   def test_conv2d_backward(self):
     # Somehow eager cpu produces different results than us, and
     # therefore we can't compare eager and xla.
@@ -1830,42 +1853,6 @@ class TestModelComparator(test_utils.XlaTestCase):
     if report:
       print(report)
     self.assertEqual(len(report), 0)
-
-
-class TestAsyncScalar(test_utils.XlaTestCase):
-
-  def test_rng_seed_transfer(self):
-    xla_device = xm.xla_device()
-    async_mode = xu.getenv_as('XLA_TRANSFER_SCALAR_ASYNC', bool, defval=False)
-    # mark_step to clear the rng seed
-    xm.mark_step()
-
-    transfer_to_server_async_metric = met.metric_data("TransferToServerAsync")
-    async_transfer_count = 0 if transfer_to_server_async_metric == None else transfer_to_server_async_metric[
-        0]
-    t1 = torch.randn(3, 3, device=xla_device)
-    xm.mark_step()
-    if async_mode:
-      assert met.metric_data(
-          "TransferToServerAsync")[0] == async_transfer_count + 1
-    else:
-      assert met.metric_data("TransferToServerAsync") == None
-
-  def test_scalar_transfer(self):
-    xla_device = xm.xla_device()
-    async_mode = xu.getenv_as('XLA_TRANSFER_SCALAR_ASYNC', bool, defval=False)
-
-    transfer_to_server_async_metric = met.metric_data("TransferToServerAsync")
-    async_transfer_count = 0 if transfer_to_server_async_metric == None else transfer_to_server_async_metric[
-        0]
-    t1 = torch.randn(3, 3).to(xla_device)
-    t2 = t1 / 0.5
-    t3 = t2.cpu()
-    if async_mode:
-      assert met.metric_data(
-          "TransferToServerAsync")[0] == async_transfer_count + 1
-    else:
-      assert met.metric_data("TransferToServerAsync") == None
 
 
 class TestWaitDeviceOps(test_utils.XlaTestCase):
@@ -2074,6 +2061,28 @@ class RegisterXLAKeyTest(test_utils.XlaTestCase):
     torch_xla._XLAC._init_xla_lazy_backend()
     torch_xla._XLAC._init_xla_lazy_backend()
     self.assertEqual(met.counter_value("RegisterXLAFunctions"), 1)
+
+
+# Only fails in CI https://github.com/pytorch/xla/pull/5431
+@unittest.skip
+class TestLoweringContext(test_utils.XlaTestCase):
+
+  def test_api(self):
+    device = xm.xla_device()
+    a = torch.rand(10, device=device)
+    b = torch.rand(10, device=device)
+    xm.mark_step()
+
+    result = a + b
+
+    ctx = torch_xla._XLAC.lowering.LoweringContext()
+    ctx.build([result])
+    hlo = ctx.hlo()
+    hlo_text = ctx.hlo_text()
+    self.assertTrue('opcode: "parameter"' in hlo_text)
+    self.assertTrue('opcode: "add"' in hlo_text)
+    mapping = ctx.parameter_id_tensor_mapping()
+    self.assertEqual(len(mapping), 2)
 
 
 class TestGeneric(test_utils.XlaTestCase):

@@ -476,7 +476,8 @@ xla::XlaOp BuildBernoulli(xla::XlaOp probability, xla::XlaOp seed,
       xla::Zero(probability.builder(), probability_shape.element_type());
   xla::XlaOp one =
       xla::One(probability.builder(), probability_shape.element_type());
-  xla::XlaOp noise = RngUniform(seed, probability_shape, zero, one);
+  xla::XlaOp noise =
+      RngUniform(seed, probability_shape, zero, one, /*downcast=*/true);
   return xla::ConvertElementType(xla::Lt(noise, probability), type);
 }
 
@@ -501,6 +502,25 @@ xla::XlaOp BuildDropout(xla::XlaOp input, float probability, xla::XlaOp seed) {
     mask = mask / prob;
   }
   return input * mask;
+}
+
+std::vector<xla::XlaOp> BuildNativeDropout(xla::XlaOp input, xla::XlaOp seed,
+                                           float probability,
+                                           c10::optional<bool> train) {
+  const xla::Shape& shape = ShapeHelper::ShapeOfXlaOp(input);
+  if (!train.has_value() || *train) {
+    xla::XlaOp prob = XlaHelpers::ScalarBroadcast<float>(1 - probability, shape,
+                                                         input.builder());
+    xla::XlaOp one = xla::One(input.builder(), shape.element_type());
+    xla::XlaOp mask = BuildBernoulli(prob, seed, shape.element_type());
+    if (probability > 0.0f) {
+      mask = mask / (one - prob);
+    }
+    return {input * mask, mask};
+  } else {
+    xla::XlaOp one = xla::One(input.builder(), xla::PrimitiveType::PRED);
+    return {input, one};
+  }
 }
 
 std::vector<xla::XlaOp> CreateBroadcastTensors(

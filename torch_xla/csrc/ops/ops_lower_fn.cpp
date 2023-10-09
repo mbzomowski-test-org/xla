@@ -1,3 +1,5 @@
+#include <torch/csrc/lazy/core/helpers.h>
+
 #include "torch_xla/csrc/LazyIr.h"
 #include "torch_xla/csrc/convert_ops.h"
 #include "torch_xla/csrc/data_ops.h"
@@ -105,6 +107,32 @@ torch_xla::XlaOpVector Any::Lower(LoweringContext* loctx) const {
 torch_xla::XlaOpVector AnyDim::Lower(LoweringContext* loctx) const {
   xla::XlaOp input = loctx->GetOutputOp(operand(0));
   return ReturnOp(BuildAny(input, {dim}, keepdim), loctx);
+}
+
+torch_xla::XlaOpVector Argmax::Lower(LoweringContext* loctx) const {
+  xla::XlaOp input = loctx->GetOutputOp(operand(0));
+  const xla::Shape& input_shape = ShapeHelper::ShapeOfXlaOp(input);
+  if (dim.has_value()) {
+    int64_t canonical_dim = torch::lazy::GetCanonicalDimensionIndex(
+        dim.value(), input_shape.rank());
+    return ReturnOp(torch_xla::BuildArgMax(input, canonical_dim, keepdim),
+                    loctx);
+  } else {
+    return ReturnOp(torch_xla::BuildArgMax(input, -1, false), loctx);
+  }
+}
+
+torch_xla::XlaOpVector Argmin::Lower(LoweringContext* loctx) const {
+  xla::XlaOp input = loctx->GetOutputOp(operand(0));
+  const xla::Shape& input_shape = ShapeHelper::ShapeOfXlaOp(input);
+  if (dim.has_value()) {
+    int64_t canonical_dim = torch::lazy::GetCanonicalDimensionIndex(
+        dim.value(), input_shape.rank());
+    return ReturnOp(torch_xla::BuildArgMin(input, canonical_dim, keepdim),
+                    loctx);
+  } else {
+    return ReturnOp(torch_xla::BuildArgMin(input, -1, false), loctx);
+  }
 }
 
 torch_xla::XlaOpVector Asin::Lower(LoweringContext* loctx) const {
@@ -520,6 +548,20 @@ torch_xla::XlaOpVector LogSigmoidBackward::Lower(LoweringContext* loctx) const {
       BuildLogSigmoidBackward(xla_grad_output, xla_input, xla_buffer), loctx);
 }
 
+torch_xla::XlaOpVector MaskedFillScalar::Lower(LoweringContext* loctx) const {
+  xla::XlaOp xla_input = loctx->GetOutputOp(operand(0));
+  xla::XlaOp mask = loctx->GetOutputOp(operand(1));
+  xla::XlaOp scalar = loctx->GetOutputOp(operand(2));
+  return ReturnOp(BuildMaskedFillScalar(xla_input, mask, scalar), loctx);
+}
+
+torch_xla::XlaOpVector MaskedFillTensor::Lower(LoweringContext* loctx) const {
+  xla::XlaOp xla_input = loctx->GetOutputOp(operand(0));
+  xla::XlaOp mask = loctx->GetOutputOp(operand(1));
+  xla::XlaOp tensor = loctx->GetOutputOp(operand(2));
+  return ReturnOp(BuildMaskedFillScalar(xla_input, mask, tensor), loctx);
+}
+
 torch_xla::XlaOpVector Maximum::Lower(LoweringContext* loctx) const {
   xla::XlaOp xla_input = loctx->GetOutputOp(operand(0));
   xla::XlaOp xla_other = loctx->GetOutputOp(operand(1));
@@ -532,6 +574,20 @@ torch_xla::XlaOpVector Minimum::Lower(LoweringContext* loctx) const {
   xla::XlaOp xla_other = loctx->GetOutputOp(operand(1));
   auto promoted = XlaHelpers::Promote(xla_input, xla_other);
   return ReturnOp(xla::Min(promoted.first, promoted.second), loctx);
+}
+
+torch_xla::XlaOpVector NativeDropoutBackward::Lower(
+    LoweringContext* loctx) const {
+  xla::XlaOp grad_output = loctx->GetOutputOp(operand(0));
+  xla::XlaOp mask = loctx->GetOutputOp(operand(1));
+  xla::PrimitiveType grad_type =
+      ShapeHelper::ShapeOfXlaOp(grad_output).element_type();
+  xla::XlaOp res = grad_output * xla::ConvertElementType(mask, grad_type);
+  if (scale != 1.0) {
+    res = res * XlaHelpers::ScalarValue<float>(scale, grad_type,
+                                               grad_output.builder());
+  }
+  return ReturnOp(res, loctx);
 }
 
 torch_xla::XlaOpVector NeScalar::Lower(LoweringContext* loctx) const {

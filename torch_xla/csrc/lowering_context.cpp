@@ -9,8 +9,8 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/string_view.h"
-#include "torch_xla/csrc/computation.h"
 #include "torch_xla/csrc/ir.h"
+#include "torch_xla/csrc/runtime/computation_client.h"
 #include "torch_xla/csrc/runtime/debug_macros.h"
 #include "torch_xla/csrc/runtime/sys_util.h"
 #include "torch_xla/csrc/shape_helper.h"
@@ -98,9 +98,11 @@ xla::XlaOp LoweringContext::GetParameter(
   torch::lazy::BackendData::Handle handle = data->GetHandle();
   auto it = parameters_map_.find(handle);
   if (it == parameters_map_.end()) {
-    xla::XlaOp param = xla::Parameter(builder(), parameters_.size(),
-                                      UnwrapXlaData(data)->shape(),
-                                      absl::StrCat("p", parameters_.size()));
+    xla::XlaOp param = xla::Parameter(
+        builder(), parameters_.size(),
+        std::dynamic_pointer_cast<runtime::ComputationClient::Data>(data)
+            ->shape(),
+        absl::StrCat("p", parameters_.size()));
     it = parameters_map_.emplace(handle, Parameter{param, parameters_.size()})
              .first;
     parameters_.push_back(data);
@@ -208,7 +210,9 @@ bool LoweringContext::CheckResultShape(
     const torch::lazy::BackendDataPtr& parameter_data, size_t result_idx) {
   xla::XlaOp root = GetResult(result_idx);
   const xla::Shape& root_shape = ShapeHelper::ShapeOfXlaOp(root);
-  return UnwrapXlaData(parameter_data)->shape() == root_shape;
+  return std::dynamic_pointer_cast<runtime::ComputationClient::Data>(
+             parameter_data)
+             ->shape() == root_shape;
 }
 
 size_t LoweringContext::AddResult(const torch::lazy::Output& output) {
@@ -231,7 +235,7 @@ void LoweringContext::AddParameter(const torch::lazy::Output& output,
 
 torch::lazy::ComputationPtr LoweringContext::Build() {
   xla::XlaComputation xla_computation = ConsumeValue(BuildXla());
-  return std::make_shared<torch_xla::Computation>(
+  return std::make_shared<runtime::ComputationClient::Computation>(
       builder_.name(), std::move(xla_computation), device_);
 }
 

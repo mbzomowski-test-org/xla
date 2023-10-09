@@ -48,7 +48,6 @@ ptxla_cc_library(
         "matrix.cpp",
         "nll_loss.cpp",
         "nms_op.cpp",
-        "op_by_op_executor.cpp",
         "pooling.cpp",
         "random.cpp",
         "reduction.cpp",
@@ -88,7 +87,6 @@ ptxla_cc_library(
         "matrix.h",
         "nll_loss.h",
         "nms_op.h",
-        "op_by_op_executor.h",
         "pooling.h",
         "random.h",
         "reduction.h",
@@ -113,7 +111,6 @@ ptxla_cc_library(
     ] + glob(["ops/*.h"]),
     deps = [
         ":aten_cpu_fallback",
-        ":computation",
         ":device",
         ":einsum_utilities",
         ":ir",
@@ -164,22 +161,13 @@ ptxla_cc_library(
     srcs = ["device.cpp"],
     hdrs = ["device.h"],
     deps = [
-        "//torch_xla/csrc/runtime",
+        "//torch_xla/csrc/runtime:tf_logging",
+        "//torch_xla/csrc/runtime:debug_macros",
+        "//torch_xla/csrc/runtime:sys_util",
         "//torch_xla/csrc/runtime:util",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:optional",
         "@xla//xla/client:xla_builder",
-    ],
-)
-
-ptxla_cc_library(
-    name = "computation",
-    srcs = ["computation.cpp"],
-    hdrs = ["computation.h"],
-    deps = [
-        "//torch_xla/csrc/runtime",
-        "@xla//xla/client:xla_builder",
-        "@xla//xla/client:xla_computation",
     ],
 )
 
@@ -259,7 +247,6 @@ ptxla_cc_library(
     name = "init_python_bindings",
     srcs = ["init_python_bindings.cpp"],
     deps = [
-        ":computation",
         ":device",
         ":tensor",
         ":version",
@@ -298,11 +285,9 @@ ptxla_cc_library(
         "lowering_context.h",
     ],
     deps = [
-        ":computation",
         ":device",
         ":shape_helper",
         ":unwrap_data",
-        ":xla_data",
         "//torch_xla/csrc/runtime:cache",
         "//torch_xla/csrc/runtime:computation_client",
         "@com_google_absl//absl/types:span",
@@ -320,21 +305,10 @@ cc_library(
 )
 
 ptxla_cc_library(
-    name = "xla_data",
-    srcs = ["xla_data.cpp"],
-    hdrs = ["xla_data.h"],
-    deps = [
-        ":device",
-        "//torch_xla/csrc/runtime:computation_client",
-    ],
-)
-
-ptxla_cc_library(
     name = "unwrap_data",
     srcs = ["unwrap_data.cpp"],
     hdrs = ["unwrap_data.h"],
     deps = [
-        ":xla_data",
         "//torch_xla/csrc/runtime:computation_client",
         "@com_google_absl//absl/types:span",
     ],

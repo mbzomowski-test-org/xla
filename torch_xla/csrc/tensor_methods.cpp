@@ -23,8 +23,6 @@
 #include "torch_xla/csrc/ops/all_to_all.h"
 #include "torch_xla/csrc/ops/amp_foreach_non_finite_check_and_unscale.h"
 #include "torch_xla/csrc/ops/amp_update_scale.h"
-#include "torch_xla/csrc/ops/arg_max.h"
-#include "torch_xla/csrc/ops/arg_min.h"
 #include "torch_xla/csrc/ops/arithmetic_ir_ops.h"
 #include "torch_xla/csrc/ops/as_strided.h"
 #include "torch_xla/csrc/ops/avg_pool_nd.h"
@@ -64,7 +62,6 @@
 #include "torch_xla/csrc/ops/linspace.h"
 #include "torch_xla/csrc/ops/log_softmax.h"
 #include "torch_xla/csrc/ops/logsumexp.h"
-#include "torch_xla/csrc/ops/masked_fill.h"
 #include "torch_xla/csrc/ops/masked_scatter.h"
 #include "torch_xla/csrc/ops/masked_select.h"
 #include "torch_xla/csrc/ops/max_in_dim.h"
@@ -78,6 +75,7 @@
 #include "torch_xla/csrc/ops/multinomial.h"
 #include "torch_xla/csrc/ops/native_batch_norm_backward.h"
 #include "torch_xla/csrc/ops/native_batch_norm_forward.h"
+#include "torch_xla/csrc/ops/native_dropout.h"
 #include "torch_xla/csrc/ops/nll_loss.h"
 #include "torch_xla/csrc/ops/nll_loss2d.h"
 #include "torch_xla/csrc/ops/nll_loss2d_backward.h"
@@ -131,6 +129,7 @@
 #include "torch_xla/csrc/ops/var.h"
 #include "torch_xla/csrc/ops/var_mean.h"
 #include "torch_xla/csrc/ops/view.h"
+#include "torch_xla/csrc/runtime/computation_client.h"
 #include "torch_xla/csrc/runtime/debug_macros.h"
 #include "torch_xla/csrc/runtime/metrics.h"
 #include "torch_xla/csrc/runtime/sys_util.h"
@@ -531,7 +530,7 @@ void adam_optimizer_step_(const XLATensorPtr& found_inf, XLATensorPtr& step,
 
 std::vector<XLATensorPtr> user_computation(
     const std::string& opname, absl::Span<const XLATensorPtr> inputs,
-    ComputationPtr computation) {
+    runtime::ComputationClient::ComputationPtr computation) {
   XLA_CHECK(!inputs.empty());
   std::vector<torch::lazy::Value> input_values;
   for (auto& input : inputs) {
@@ -695,34 +694,6 @@ void arange_out(XLATensorPtr& out, const at::Scalar& start,
                 at::ScalarType scalar_type) {
   out->SetIrValue(ARange(start, end, step, scalar_type));
   out->SetScalarType(scalar_type);
-}
-
-XLATensorPtr argmax(const XLATensorPtr& input, int64_t dim, bool keepdim) {
-  int64_t canonical_dim =
-      torch::lazy::GetCanonicalDimensionIndex(dim, input->shape().get().rank());
-  return input->CreateFrom(torch::lazy::MakeNode<ArgMax>(
-                               input->GetIrValue(), canonical_dim, keepdim),
-                           at::ScalarType::Long);
-}
-
-XLATensorPtr argmax(const XLATensorPtr& input) {
-  return input->CreateFrom(
-      torch::lazy::MakeNode<ArgMax>(input->GetIrValue(), -1, false),
-      at::ScalarType::Long);
-}
-
-XLATensorPtr argmin(const XLATensorPtr& input, int64_t dim, bool keepdim) {
-  int64_t canonical_dim =
-      torch::lazy::GetCanonicalDimensionIndex(dim, input->shape().get().rank());
-  return input->CreateFrom(torch::lazy::MakeNode<ArgMin>(
-                               input->GetIrValue(), canonical_dim, keepdim),
-                           at::ScalarType::Long);
-}
-
-XLATensorPtr argmin(const XLATensorPtr& input) {
-  return input->CreateFrom(
-      torch::lazy::MakeNode<ArgMin>(input->GetIrValue(), -1, false),
-      at::ScalarType::Long);
 }
 
 XLATensorPtr as_strided(const XLATensorPtr& input, std::vector<int64_t> size,
@@ -1602,22 +1573,6 @@ XLATensorPtr lt(const XLATensorPtr& input, const XLATensorPtr& other) {
   return DispatchComparisonOp(at::aten::lt, input, other);
 }
 
-XLATensorPtr masked_fill(XLATensorPtr& input, const XLATensorPtr& mask,
-                         const at::Scalar& value) {
-  torch::lazy::ScopePusher ir_scope(at::aten::masked_fill.toQualString());
-  auto input_value = input->GetIrValue();
-  // Expand input tensor to mask if needed (same as masked_scatter below).
-  // An additional check makes sure to only expand if the rank of input tensor
-  // is less than that of the mask tensor.
-  if (input->shape().get().rank() <= mask->shape().get().rank() &&
-      input->shape().get().dimensions() < mask->shape().get().dimensions()) {
-    input_value = MaybeExpand(input->GetIrValue(), mask->shape());
-  }
-  return input->CreateFrom(torch::lazy::MakeNode<MaskedFill>(
-      input_value, MaybeExpand(mask->GetIrValue(), GetXlaShape(input_value)),
-      value));
-}
-
 XLATensorPtr masked_scatter(XLATensorPtr& input, const XLATensorPtr& mask,
                             const XLATensorPtr& source) {
   torch::lazy::ScopePusher ir_scope(at::aten::masked_scatter.toQualString());
@@ -1914,6 +1869,16 @@ std::tuple<XLATensorPtr, XLATensorPtr, XLATensorPtr> native_batch_norm_backward(
   XLATensorPtr grad_bias = input->CreateFrom(torch::lazy::Value(node, 2));
   return std::make_tuple(std::move(grad_input), std::move(grad_weight),
                          std::move(grad_bias));
+}
+
+std::tuple<XLATensorPtr, XLATensorPtr> native_dropout(
+    const XLATensorPtr& input, double p, c10::optional<bool> train) {
+  torch::lazy::NodePtr node = torch::lazy::MakeNode<NativeDropout>(
+      input->GetIrValue(),
+      XLAGraphExecutor::Get()->GetRngSeed(input->GetDevice()), p, train);
+  return std::make_tuple(
+      input->CreateFrom(torch::lazy::Value(node, 0)),
+      input->CreateFrom(torch::lazy::Value(node, 1), at::ScalarType::Bool));
 }
 
 XLATensorPtr ne(const XLATensorPtr& input, const at::Scalar& other) {

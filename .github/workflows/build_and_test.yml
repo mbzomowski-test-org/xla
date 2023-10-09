@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - master
-    tags:
       - r[0-9]+.[0-9]+
   workflow_dispatch:
 
@@ -44,7 +43,7 @@ jobs:
     with:
       docker-image: ${{ needs.build.outputs.docker-image }}
       runner: linux.8xlarge.nvidia.gpu
-      timeout-minutes: 240
+      timeout-minutes: 300
       disable-xrt: 1
     secrets:
       gcloud-service-key: ${{ secrets.GCLOUD_SERVICE_KEY }}
@@ -52,7 +51,7 @@ jobs:
   test-cpu-coverage:
     name: "Collect CPU test coverage"
     if: github.event_name == 'push' && github.event.ref == 'refs/heads/master'
-    uses: ./.github/workflows/_test.yml
+    uses: ./.github/workflows/_coverage.yml
     needs: build
     with:
       docker-image: ${{ needs.build.outputs.docker-image }}
@@ -65,12 +64,12 @@ jobs:
   test-gpu-coverage:
     name: "Collect GPU test coverage"
     if: github.event_name == 'push' && github.event.ref == 'refs/heads/master'
-    uses: ./.github/workflows/_test.yml
+    uses: ./.github/workflows/_coverage.yml
     needs: build
     with:
       docker-image: ${{ needs.build.outputs.docker-image }}
       runner: linux.8xlarge.nvidia.gpu
-      timeout-minutes: 210
+      timeout-minutes: 300
       collect-coverage: true
       disable-xrt: 1
     secrets:

@@ -35,15 +35,10 @@ from torch.distributed.checkpoint.metadata import (
 from torch.distributed.checkpoint.utils import find_state_dict_object
 from torch.utils._pytree import tree_map
 from torch_xla.experimental.xla_sharding import XLAShardedTensor, XLAShard
-from torch_xla.experimental._distributed_checkpoint_helpers import (
+from torch_xla.experimental.distributed_checkpoint._helpers import (
     FLATTEN_MAPPING, flatten_state_dict, dedup_tensors, _is_sharded_tensor,
     set_element, narrow_tensor_by_index, _unwrap_xla_sharded_tensor, _CpuShards)
 from typing import Any, Dict, List, Tuple, Union
-
-__all__ = [
-    "SPMDSavePlanner",
-    "SPMDLoadPlanner",
-]
 
 
 class SPMDSavePlanner(SavePlanner):
@@ -333,9 +328,10 @@ def _create_write_items_for_xla_sharded_tensor(
   items = []
   # Since local shards are currently moved to CPU on creation, we need to get
   # the shard indices indirectly to avoid unnecessarily consuming host memory.
-  shard_indices = torch_xla._XLAC._get_local_shard_indices(t.global_tensor)
+  replica_and_indices = torch_xla._XLAC._get_local_shard_replica_and_indices(
+      t.global_tensor)
   prop = TensorProperties.create_from_tensor(t)
-  for shard_ind, indices in enumerate(shard_indices):
+  for shard_ind, (_, indices) in enumerate(replica_and_indices):
     write_item = _create_write_item_from_indices(fqn, shard_ind, indices,
                                                  t.size(), prop)
     items.append(write_item)
@@ -389,7 +385,10 @@ def _create_xla_read_items(sharded_state_dict: STATE_DICT_TYPE,
     md = metadata.state_dict_metadata[fqn]
     # Since local shards are currently moved to CPU on creation, we need to get
     # the shard indices indirectly to avoid unnecessarily consuming host memory.
-    shard_indices = torch_xla._XLAC._get_local_shard_indices(t.global_tensor)
-    chunks = [_create_chunk_from_shard_index(index) for index in shard_indices]
+    replica_and_indices = torch_xla._XLAC._get_local_shard_replica_and_indices(
+        t.global_tensor)
+    chunks = [
+        _create_chunk_from_shard_index(ind) for _, ind in replica_and_indices
+    ]
     items.extend(create_read_items_for_chunk_list(fqn, md, chunks))
   return items

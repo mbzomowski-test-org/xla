@@ -81,7 +81,7 @@ at::Tensor to_meta(const at::Tensor& tensor) {
 torch::lazy::BackendDevice GetXlaDeviceOrCurrent(
     const c10::optional<c10::Device>& device) {
   auto xla_device_opt = bridge::GetXlaDevice(device);
-  return xla_device_opt ? *xla_device_opt : GetCurrentDevice();
+  return xla_device_opt ? *xla_device_opt : bridge::GetCurrentDevice();
 }
 
 bool IsOperationOnType(const c10::optional<at::ScalarType>& opt_dtype,
@@ -689,26 +689,6 @@ at::Tensor& XLANativeFunctions::arange_out(const at::Scalar& start,
   return out;
 }
 
-at::Tensor XLANativeFunctions::argmax(const at::Tensor& self,
-                                      c10::optional<int64_t> dim,
-                                      bool keepdim) {
-  TORCH_LAZY_FN_COUNTER("xla::");
-  return dim ? bridge::AtenFromXlaTensor(tensor_methods::argmax(
-                   bridge::GetXlaTensor(self), *dim, keepdim))
-             : bridge::AtenFromXlaTensor(
-                   tensor_methods::argmax(bridge::GetXlaTensor(self)));
-}
-
-at::Tensor XLANativeFunctions::argmin(const at::Tensor& self,
-                                      c10::optional<int64_t> dim,
-                                      bool keepdim) {
-  TORCH_LAZY_FN_COUNTER("xla::");
-  return dim ? bridge::AtenFromXlaTensor(tensor_methods::argmin(
-                   bridge::GetXlaTensor(self), *dim, keepdim))
-             : bridge::AtenFromXlaTensor(
-                   tensor_methods::argmin(bridge::GetXlaTensor(self)));
-}
-
 at::Tensor XLANativeFunctions::as_strided_copy(
     const at::Tensor& self, at::IntArrayRef size, at::IntArrayRef stride,
     c10::optional<int64_t> storage_offset) {
@@ -1170,12 +1150,19 @@ at::Tensor XLANativeFunctions::einsum(c10::string_view equation,
                      [](unsigned char x) { return std::isspace(x); }),
       cleansed_equation.end());
 
-  std::vector<XLATensorPtr> xla_tensors = bridge::GetXlaTensors(tensors);
+  std::vector<XLATensorPtr> xla_tensors = bridge::TryGetXlaTensors(tensors);
+  bool all_xla_tensors_are_valid = true;
+  for (const XLATensorPtr xla_tensor : xla_tensors) {
+    if (!xla_tensor) {
+      all_xla_tensors_are_valid = false;
+      break;
+    }
+  }
 
   TORCH_LAZY_FN_COUNTER("xla::");
   // Einsum operations with more than 2 operands, like bilinear operations, are
   // not currently supported in XLA
-  if (tensors.size() < 1 || tensors.size() > 2 ||
+  if (tensors.size() < 1 || tensors.size() > 2 || !all_xla_tensors_are_valid ||
       !EinsumUtilities::EquationIsValid(cleansed_equation) ||
       TensorsAreOfType(xla_tensors, at::ScalarType::Long)) {
     TORCH_LAZY_COUNTER("EinsumFallback", 1);
@@ -1652,25 +1639,6 @@ at::Tensor XLANativeFunctions::xlogy(const at::Tensor& self,
       bridge::GetXlaTensor(self), bridge::GetXlaTensor(other)));
 }
 
-at::Tensor XLANativeFunctions::masked_fill(const at::Tensor& self,
-                                           const at::Tensor& mask,
-                                           const at::Tensor& value) {
-  TORCH_LAZY_FN_COUNTER("xla::");
-  XLA_CHECK_EQ(value.dim(), 0) << "masked_fill_ only supports a 0-dimensional "
-                               << "value tensor, but got tensor "
-                               << "with " << value.dim() << " dimension(s).";
-  return masked_fill(self, mask, value.item());
-}
-
-at::Tensor XLANativeFunctions::masked_fill(const at::Tensor& self,
-                                           const at::Tensor& mask,
-                                           const at::Scalar& value) {
-  TORCH_LAZY_FN_COUNTER("xla::");
-  XLATensorPtr self_tensor = bridge::GetXlaTensor(self);
-  return bridge::AtenFromXlaTensor(tensor_methods::masked_fill(
-      self_tensor, bridge::GetXlaTensor(mask), value));
-}
-
 at::Tensor XLANativeFunctions::masked_scatter(const at::Tensor& self,
                                               const at::Tensor& mask,
                                               const at::Tensor& source) {
@@ -2094,6 +2062,15 @@ XLANativeFunctions::native_batch_norm_backward(
                      : undefined,
       output_mask[2] ? bridge::AtenFromXlaTensor(std::get<2>(gradients))
                      : undefined);
+}
+
+std::tuple<at::Tensor, at::Tensor> XLANativeFunctions::native_dropout(
+    const at::Tensor& self, double p, c10::optional<bool> train) {
+  TORCH_LAZY_FN_COUNTER("xla::");
+  XLATensorPtr self_tensor = bridge::GetXlaTensor(self);
+  auto results = tensor_methods::native_dropout(self_tensor, p, train);
+  return std::make_tuple(bridge::AtenFromXlaTensor(std::get<0>(results)),
+                         bridge::AtenFromXlaTensor(std::get<1>(results)));
 }
 
 at::Tensor XLANativeFunctions::neg(const at::Tensor& self) {
@@ -3212,7 +3189,7 @@ at::Tensor XLANativeFunctions::upsample_nearest2d_backward(
   // our XLA lowering.
   XlaDeviceType hw_type =
       static_cast<XlaDeviceType>(grad_output_tensor->GetDevice().type());
-  if (hw_type != XlaDeviceType::TPU) {
+  if (hw_type != XlaDeviceType::TPU && hw_type != XlaDeviceType::NEURON) {
     return at::native::call_fallback_fn<
         &xla_cpu_fallback,
         ATEN_OP(upsample_nearest2d_backward)>::call(grad_output, output_size,
