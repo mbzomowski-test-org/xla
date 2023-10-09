@@ -7,6 +7,8 @@ jobs:
     steps:
       - env:
           PJRT_DEVICE: TPU
+          BUNDLE_LIBTPU: 0
+          TPUVM_MODE: 0
         run: |
           sudo apt-get upgrade -y
           sudo apt-get update -y
@@ -15,5 +17,5 @@ jobs:
           sudo python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/
-          BUNDLE_LIBTPU=0 TPUVM_MODE=0 sudo python3 setup.py install
+          sudo python3 setup.py install
           python3 test/test_operations.py -v
