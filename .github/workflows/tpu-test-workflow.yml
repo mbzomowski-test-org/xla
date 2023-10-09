@@ -13,5 +13,5 @@ jobs:
           sudo python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/
-          sudo python3 setup.py install
+          TPUVM_MODE=1 sudo python3 setup.py install
           python3 test/test_operations.py -v
