@@ -36,8 +36,8 @@ RUN curl -f -L -o runner-container-hooks.zip https://github.com/actions/runner-c
     && unzip ./runner-container-hooks.zip -d ./k8s \
     && rm runner-container-hooks.zip
 
+RUN apt-get update
 RUN echo "y" | apt-get install -y sudo
-RUN echo "y" | apt-get install -y emacs git-all
 
 RUN echo "${USER} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
     chmod 0440 /etc/sudoers && \
