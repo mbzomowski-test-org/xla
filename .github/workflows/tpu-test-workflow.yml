@@ -18,4 +18,7 @@ jobs:
           git clone --recursive https://github.com/pytorch/xla.git
           cd xla/
           sudo python3 setup.py install
+      - env:
+          PJRT_DEVICE: TPU
+        run: |
           python3 test/test_operations.py -v
