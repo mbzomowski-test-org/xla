@@ -24,4 +24,5 @@ jobs:
           pwd
           ls -al
           cd pytorch/xla
+          sleep infinity
           python3 test/test_operations.py -v
