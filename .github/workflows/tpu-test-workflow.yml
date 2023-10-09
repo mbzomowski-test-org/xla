@@ -22,5 +22,6 @@ jobs:
           PJRT_DEVICE: TPU
         run: |
           pwd
-          cd ~/pytorch/xla
+          ls -al
+          cd pytorch/xla
           python3 test/test_operations.py -v
