@@ -6,7 +6,6 @@ jobs:
     runs-on: runner-set
     steps:
       - env:
-          PJRT_DEVICE: TPU
           BUNDLE_LIBTPU: 1
           TPUVM_MODE: 1
         run: |
