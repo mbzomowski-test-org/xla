@@ -15,9 +15,11 @@ jobs:
       - env:
           TPUVM_MODE: 1
           BUNDLE_LIBTPU: 1
-          PYTHONBUFFERED: "1"
+          PYTHONBUFFERED: 1
         run: |
-          cd xla/
+          pwd
+          ls -al
+          cd _work/xla/xla/pytorch/xla/
           sudo python3 setup.py install
       - env:
           PJRT_DEVICE: TPU
