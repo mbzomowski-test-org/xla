@@ -16,7 +16,7 @@ jobs:
           TPUVM_MODE: 1
           BUNDLE_LIBTPU: 1
           PYTHONBUFFERED: "1"
-        run:
+        run: |
           cd xla/
           sudo python3 setup.py install
       - env:
