@@ -10,7 +10,8 @@ jobs:
           sudo apt-get update -y
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          sudo python3 setup.py install
+          output=$(sudo python3 setup.py install)
+          echo $output
           git clone --recursive https://github.com/pytorch/xla.git
       - env:
           TPUVM_MODE: 1
@@ -20,7 +21,8 @@ jobs:
           ls -al
           ls -al pytorch
           cd pytorch/xla
-          sudo python3 -u setup.py install
+          output=$(sudo python3 -u setup.py install)
+          echo $output
       - env:
           PJRT_DEVICE: TPU
         run: |
