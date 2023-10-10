@@ -9,6 +9,7 @@ jobs:
           PJRT_DEVICE: TPU
           BUNDLE_LIBTPU: 1
           TPUVM_MODE: 1
+          ACTIONS_RUNNER_DEBUG: true
         run: |
           sudo apt-get upgrade -y
           sudo apt-get update -y
@@ -20,6 +21,7 @@ jobs:
           sudo python3 setup.py install
       - env:
           PJRT_DEVICE: TPU
+          ACTIONS_RUNNER_DEBUG: true
         run: |
           pwd
           ls -al
