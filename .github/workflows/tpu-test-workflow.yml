@@ -8,6 +8,7 @@ jobs:
       - env:
           BUNDLE_LIBTPU: 1
           TPUVM_MODE: 1
+          PYTHONUNBUFFERED: "1"
         run: |
           sudo apt-get upgrade -y
           sudo apt-get update -y
