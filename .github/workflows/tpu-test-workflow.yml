@@ -5,17 +5,18 @@ jobs:
   tpu-test:
     runs-on: runner-set
     steps:
-      - env:
-          BUNDLE_LIBTPU: 1
-          TPUVM_MODE: 1
-          PYTHONUNBUFFERED: "1"
-        run: |
+      - run: |
           sudo apt-get upgrade -y
           sudo apt-get update -y
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           sudo python3 setup.py install
           git clone --recursive https://github.com/pytorch/xla.git
+      - env:
+          TPUVM_MODE: 1
+          BUNDLE_LIBTPU: 1
+          PYTHONBUFFERED: "1"
+        run:
           cd xla/
           sudo python3 setup.py install
       - env:
