@@ -19,7 +19,8 @@ jobs:
         run: |
           pwd
           ls -al
-          cd _work/xla/xla/pytorch/xla/
+          ls -al pytorch
+          cd pytorch/xla
           sudo python3 setup.py install
       - env:
           PJRT_DEVICE: TPU
@@ -27,5 +28,4 @@ jobs:
           pwd
           ls -al
           cd pytorch/xla
-          sleep infinity
           python3 test/test_operations.py -v
