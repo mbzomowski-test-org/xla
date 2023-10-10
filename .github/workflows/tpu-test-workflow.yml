@@ -15,18 +15,16 @@ jobs:
       - env:
           TPUVM_MODE: 1
           BUNDLE_LIBTPU: 1
-          PYTHONBUFFERED: 1
         run: |
           pwd
           ls -al
           ls -al pytorch
           cd pytorch/xla
-          sudo pip3 install torch_xla[tpu] -f https://storage.googleapis.com/libtpu-releases/index.html
-          sudo python3 setup.py install
+          sudo python3 -u setup.py install
       - env:
           PJRT_DEVICE: TPU
         run: |
           pwd
           ls -al
           cd pytorch/xla
-          python3 test/test_operations.py -v
+          python3 -u test/test_operations.py -v
