@@ -21,6 +21,7 @@ jobs:
           ls -al
           ls -al pytorch
           cd pytorch/xla
+          sudo pip3 install torch_xla[tpu] -f https://storage.googleapis.com/libtpu-releases/index.html
           sudo python3 setup.py install
       - env:
           PJRT_DEVICE: TPU
