@@ -19,7 +19,6 @@ jobs:
           unset BAZEL_REMOTE_CACHE
           unset CACHE_SILO_NAME
           printenv
-          sleep infinity
           cd pytorch/xla
           python3 setup.py install --user
       - env:
