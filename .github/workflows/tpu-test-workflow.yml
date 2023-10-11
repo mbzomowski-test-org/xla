@@ -17,8 +17,8 @@ jobs:
           echo "TPUVM_MODE=1" >> "$GITHUB_ENV"
       - run: |
           pwd
-          ls -al
-          ls -al pytorch
+          echo $BUNDLE_LIBTPU
+          echo $TPUVM_MODE
           cd pytorch/xla
           output=$(sudo python3 setup.py install)
           echo $output
