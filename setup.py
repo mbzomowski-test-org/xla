@@ -137,7 +137,7 @@ def maybe_bundle_libtpu(base_dir):
     os.remove(libtpu_path)
 
   print('bzmarke 3: result of check_env_flag: {}'.format(_check_env_flag('BUNDLE_LIBTPU', '0')))
-  if not os.environ('BUNDLE_LIBTPU') == 1: # _check_env_flag('BUNDLE_LIBTPU', '0'):
+  if not os.environ['BUNDLE_LIBTPU'] == 1: # _check_env_flag('BUNDLE_LIBTPU', '0'):
     print('bzmarke 4: checkpoint')
     return
 
@@ -200,7 +200,7 @@ version = get_build_version(xla_git_sha)
 
 build_mode = _get_build_mode()
 print('bzmarke 0: BUNDLE_LIBTPU: {}, TPUVM_MODE: {}'.format(os.getenv('BUNDLE_LIBTPU'), os.getenv('TPUVM_MODE')))
-print('bzmarke 0: BUNDLE_LIBTPU: {}, TPUVM_MODE: {}'.format(os.environ('BUNDLE_LIBTPU'), os.environ('TPUVM_MODE')))
+print('bzmarke 0: BUNDLE_LIBTPU: {}, TPUVM_MODE: {}'.format(os.environ['BUNDLE_LIBTPU'], os.environ['TPUVM_MODE']))
 print('bzmarke 1: build_mode: {}'.format(build_mode))
 if build_mode not in ['clean']:
   # Generate version info (torch_xla.__version__).
