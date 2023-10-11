@@ -19,6 +19,8 @@ jobs:
           pwd
           echo $BUNDLE_LIBTPU
           echo $TPUVM_MODE
+          export BUNDLE_LIBTPU
+          export TPUVM_MODE
           cd pytorch/xla
           output=$(sudo python3 setup.py install)
           echo $output
