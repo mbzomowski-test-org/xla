@@ -34,6 +34,6 @@ RUN curl -f -L -o runner-container-hooks.zip https://github.com/actions/runner-c
     && rm runner-container-hooks.zip
 
 RUN apt-get update
-RUN echo "y" | apt-get install -y sudo
+RUN apt-get upgrade
 
 USER runner
