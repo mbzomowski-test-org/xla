@@ -6,6 +6,7 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
+          pip install torchgen
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           python3 setup.py install
