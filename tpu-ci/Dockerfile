@@ -37,10 +37,16 @@ RUN curl -f -L -o runner-container-hooks.zip https://github.com/actions/runner-c
 
 RUN apt-get update
 RUN echo "y" | apt-get upgrade
+RUN echo $PATH
+RUN which bazel
 # RUN echo "y" | apt-get install sudo
 
 # RUN echo "${USER} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
 #     chmod 0440 /etc/sudoers && \
 #     chmod g+w /etc/passwd
 
+RUN chown $USER:$USER /usr/local/bin/bazel
 USER $USER
+
+RUN echo $PATH
+RUN which bazel

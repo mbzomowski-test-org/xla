@@ -16,8 +16,6 @@ jobs:
       - env:
           BAZEL_VERBOSE: 1
         run: |
-          unset BAZEL_REMOTE_CACHE
-          unset CACHE_SILO_NAME
           printenv
           cd pytorch/xla
           python3 setup.py install --user
