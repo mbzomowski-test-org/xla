@@ -6,11 +6,11 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
-          sudo apt-get upgrade -y
-          sudo apt-get update -y
+          apt-get upgrade -y
+          apt-get update -y
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          sudo python3 setup.py install
+          python3 setup.py install
           git clone --recursive https://github.com/mbzomowski/xla.git
       - run: |
           echo "BUNDLE_LIBTPU=1" >> "$GITHUB_ENV"
