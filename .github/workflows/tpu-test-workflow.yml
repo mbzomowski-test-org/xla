@@ -21,6 +21,8 @@ jobs:
           unset BAZEL_REMOTE_CACHE
           unset CACHE_SILO_NAME
           printenv
+          which bazel
+          cd pytorch/xla
           python3 setup.py install --user
       - env:
           PJRT_DEVICE: TPU
