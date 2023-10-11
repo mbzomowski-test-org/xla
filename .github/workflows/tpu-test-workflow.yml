@@ -15,8 +15,12 @@ jobs:
       - run: |
           echo "BUNDLE_LIBTPU=1" >> "$GITHUB_ENV"
           echo "TPUVM_MODE=1" >> "$GITHUB_ENV"
-      - run: |
-          which bazel
+      - env:
+          BAZEL_VERBOSE: 1
+        run: |
+          unset BAZEL_REMOTE_CACHE
+          unset CACHE_SILO_NAME
+          printenv
           python3 setup.py install --user
       - env:
           PJRT_DEVICE: TPU
