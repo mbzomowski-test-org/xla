@@ -22,8 +22,7 @@ jobs:
           export BUNDLE_LIBTPU
           export TPUVM_MODE
           cd pytorch/xla
-          output=$(sudo python3 setup.py install)
-          echo $output
+          sudo python3 setup.py install
       - env:
           PJRT_DEVICE: TPU
         run: |

@@ -137,7 +137,7 @@ def maybe_bundle_libtpu(base_dir):
     os.remove(libtpu_path)
 
   print('bzmarke 3: result of check_env_flag: {}'.format(_check_env_flag('BUNDLE_LIBTPU', '0')))
-  if not os.environ['BUNDLE_LIBTPU'] == 1: # _check_env_flag('BUNDLE_LIBTPU', '0'):
+  if not _check_env_flag('BUNDLE_LIBTPU', '0'):
     print('bzmarke 4: checkpoint')
     return
 
