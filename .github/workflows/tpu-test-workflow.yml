@@ -6,10 +6,9 @@ jobs:
     runs-on: runner-set
     steps:
       - run: |
-          pip install torchgen
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          python3 setup.py install
+          python3 setup.py install --user
           git clone --recursive https://github.com/mbzomowski/xla.git
       - run: |
           echo "BUNDLE_LIBTPU=1" >> "$GITHUB_ENV"

@@ -10,6 +10,8 @@ ARG RUNNER_ARCH="x64"
 # ex: 0.3.1
 ARG RUNNER_CONTAINER_HOOKS_VERSION="0.4.0"
 
+ARG USER=runner
+
 ENV DEBIAN_FRONTEND=noninteractive
 ENV RUNNER_MANUALLY_TRAP_SIG=1
 ENV ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT=1
@@ -34,6 +36,11 @@ RUN curl -f -L -o runner-container-hooks.zip https://github.com/actions/runner-c
     && rm runner-container-hooks.zip
 
 RUN apt-get update
-RUN apt-get upgrade
+RUN echo "y" | apt-get upgrade
+# RUN echo "y" | apt-get install sudo
 
-USER runner
+# RUN echo "${USER} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
+#     chmod 0440 /etc/sudoers && \
+#     chmod g+w /etc/passwd
+
+USER $USER
