@@ -199,6 +199,7 @@ xla_git_sha, torch_git_sha = get_git_head_sha(base_dir)
 version = get_build_version(xla_git_sha)
 
 build_mode = _get_build_mode()
+print('bzmarke 0: BUNDLE_LIBTPU: {}, TPUVM_MODE: {}'.format(os.getenv('BUNDLE_LIBTPU'), os.getenv('TPUVM_MODE')))
 print('bzmarke 1: build_mode: {}'.format(build_mode))
 if build_mode not in ['clean']:
   # Generate version info (torch_xla.__version__).
