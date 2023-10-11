@@ -17,8 +17,8 @@ jobs:
           ls -al
           ls -al pytorch
           cd pytorch/xla
-          export BUNDLE_LIBTPU='1'
-          export TPUVM_MODE='1'
+          echo "export BUNDLE_LIBTPU=1"
+          echo "export TPUVM_MODE=1"
           output=$(sudo python3 setup.py install)
           echo $output
       - env:
