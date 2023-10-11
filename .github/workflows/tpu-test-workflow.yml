@@ -13,12 +13,13 @@ jobs:
           sudo python3 setup.py install
           git clone --recursive https://github.com/mbzomowski/xla.git
       - run: |
+          echo "BUNDLE_LIBTPU=1" >> "$GITHUB_ENV"
+          echo "TPUVM_MODE=1" >> "$GITHUB_ENV"
+      - run: |
           pwd
           ls -al
           ls -al pytorch
           cd pytorch/xla
-          echo "export BUNDLE_LIBTPU=1"
-          echo "export TPUVM_MODE=1"
           output=$(sudo python3 setup.py install)
           echo $output
       - env:
