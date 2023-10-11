@@ -16,12 +16,7 @@ jobs:
           echo "BUNDLE_LIBTPU=1" >> "$GITHUB_ENV"
           echo "TPUVM_MODE=1" >> "$GITHUB_ENV"
       - run: |
-          pwd
-          echo $BUNDLE_LIBTPU
-          echo $TPUVM_MODE
-          export BUNDLE_LIBTPU
-          export TPUVM_MODE
-          cd pytorch/xla
+          which bazel
           python3 setup.py install --user
       - env:
           PJRT_DEVICE: TPU
