@@ -12,15 +12,14 @@ jobs:
           cd pytorch/
           sudo python3 setup.py install
           git clone --recursive https://github.com/mbzomowski/xla.git
-      - env:
-          TPUVM_MODE: 1
-          BUNDLE_LIBTPU: 0
-        run: |
+      - run: |
           pwd
           ls -al
           ls -al pytorch
           cd pytorch/xla
-          output=$(sudo python setup.py install)
+          export BUNDLE_LIBTPU=1
+          export TPUVM_MODE=1
+          output=$(sudo python3 setup.py install)
           echo $output
       - env:
           PJRT_DEVICE: TPU
