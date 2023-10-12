@@ -10,19 +10,15 @@ jobs:
           cd pytorch/
           python3 setup.py install --user
           git clone --recursive https://github.com/mbzomowski/xla.git
-      - run: |
-          echo "BUNDLE_LIBTPU=1" >> "$GITHUB_ENV"
-          echo "TPUVM_MODE=1" >> "$GITHUB_ENV"
       - env:
           BAZEL_VERBOSE: 1
+          BUNDLE_LIBTPU: 1
+          TPUVM_MODE: 1
         run: |
-          printenv
           cd pytorch/xla
           python3 setup.py install --user
       - env:
           PJRT_DEVICE: TPU
         run: |
-          pwd
-          ls -al
           cd pytorch/xla
           python3 -u test/test_operations.py -v

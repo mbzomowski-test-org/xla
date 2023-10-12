@@ -132,23 +132,18 @@ def create_version_files(base_dir, version, xla_git_sha, torch_git_sha):
 
 def maybe_bundle_libtpu(base_dir):
   libtpu_path = os.path.join(base_dir, 'torch_xla', 'lib', 'libtpu.so')
-  print('bzmarke 2: libtpu_path: {}'.format(libtpu_path))
   with contextlib.suppress(FileNotFoundError):
     os.remove(libtpu_path)
 
-  print('bzmarke 3: result of check_env_flag: {}'.format(_check_env_flag('BUNDLE_LIBTPU', '0')))
   if not _check_env_flag('BUNDLE_LIBTPU', '0'):
-    print('bzmarke 4: checkpoint')
     return
 
   try:
-    print('bzmarke 5')
     import libtpu
     module_path = os.path.dirname(libtpu.__file__)
     print('Found pre-installed libtpu at ', module_path)
     shutil.copyfile(os.path.join(module_path, 'libtpu.so'), libtpu_path)
   except ModuleNotFoundError:
-    print('bzmarke 6')
     print('No installed libtpu found. Downloading...')
 
     with tempfile.NamedTemporaryFile('wb') as whl:
@@ -199,9 +194,6 @@ xla_git_sha, torch_git_sha = get_git_head_sha(base_dir)
 version = get_build_version(xla_git_sha)
 
 build_mode = _get_build_mode()
-print('bzmarke 0: BUNDLE_LIBTPU: {}, TPUVM_MODE: {}'.format(os.getenv('BUNDLE_LIBTPU'), os.getenv('TPUVM_MODE')))
-print('bzmarke 0: BUNDLE_LIBTPU: {}, TPUVM_MODE: {}'.format(os.environ['BUNDLE_LIBTPU'], os.environ['TPUVM_MODE']))
-print('bzmarke 1: build_mode: {}'.format(build_mode))
 if build_mode not in ['clean']:
   # Generate version info (torch_xla.__version__).
   create_version_files(base_dir, version, xla_git_sha, torch_git_sha)
