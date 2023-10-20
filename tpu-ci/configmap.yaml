@@ -1,4 +1,0 @@
-secretName: github-pat
-resources: |-
-  - namespace: "flux-system"
-  - namespace: "arc-system"

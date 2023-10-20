@@ -8,8 +8,8 @@ template:
     - name: runner
       image: gcr.io/tpu-pytorch/bzmarke-image:latest
       command: ["/home/runner/run.sh"]
-      securityContext:
-        privileged: true
+        #securityContext:
+        #privileged: true
       resources:
         limits:
           google.com/tpu: 4
