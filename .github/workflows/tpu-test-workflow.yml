@@ -2,8 +2,8 @@ name: TPU Test
 run-name: ${{ github.actor }} is testing self-hosted runners on TPUs
 on: [push]
 jobs:
-  tpu-test:
-    runs-on: runner-set
+  tpu-test-1:
+    runs-on: v4-runner-set
     steps:
       - run: |
           git clone --recursive https://github.com/pytorch/pytorch
@@ -22,4 +22,23 @@ jobs:
         run: |
           cd pytorch/xla
           python3 -u test/test_operations.py -v
-          #test
+  tpu-test:
+    runs-on: v4-runner-set
+    steps:
+      - run: |
+          git clone --recursive https://github.com/pytorch/pytorch
+          cd pytorch/
+          python3 setup.py install --user
+          git clone --recursive https://github.com/mbzomowski/xla.git
+      - env:
+          BAZEL_VERBOSE: 1
+          BUNDLE_LIBTPU: 1
+          TPUVM_MODE: 1
+        run: |
+          cd pytorch/xla
+          python3 setup.py install --user
+      - env:
+          PJRT_DEVICE: TPU
+        run: |
+          cd pytorch/xla
+          python3 -u test/test_operations.py -v

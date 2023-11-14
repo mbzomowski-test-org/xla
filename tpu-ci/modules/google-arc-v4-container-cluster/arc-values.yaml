@@ -1,7 +1,7 @@
-githubConfigUrl: var.github_repo_url
+githubConfigUrl: ${github_repo_url}
 githubConfigSecret: github-pat
 minRunners: 0
-maxRunners: var.max_tpu_nodes
+maxRunners: ${max_tpu_nodes}
 template:
   spec:
     containers:

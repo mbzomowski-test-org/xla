@@ -2,6 +2,13 @@ provider "google" {
   project = var.project_id
 }
 
+provider "helm" {
+  kubernetes {
+    host = "https://${google_container_cluster.arc_v4_cluster.endpoint}"
+    token = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode(google_container_cluster.arc_v4_cluster.master_auth.0.cluster_ca_certificate)
+  }
+}
 resource "google_container_cluster" "arc_v4_cluster" {
   name = var.cluster_name
   location = "us-central2"
@@ -15,6 +22,8 @@ resource "google_container_cluster" "arc_v4_cluster" {
 
   min_master_version = 1.28
 }
+
+data "google_client_config" "default" {}
 
 resource "google_container_node_pool" "arc_v4_cpu_nodes" {
   name = var.cpu_nodepool_name
@@ -78,6 +87,9 @@ resource "helm_release" "arc-runner-set" {
   create_namespace = true
 
   values = [
-    "${file("modules/google-arc-v4-container-cluster/arc-values.yaml")}"
+    templatefile("modules/google-arc-v4-container-cluster/arc-values.yaml", {
+      github_repo_url = var.github_repo_url
+      max_tpu_nodes = var.max_tpu_nodes
+    })
   ]
 }

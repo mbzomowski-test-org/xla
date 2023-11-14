@@ -13,5 +13,7 @@ module "v4_arc_cluster" {
 
   max_tpu_nodes = 2
 
-  github_repo_url = "https://www.github.com/mbzomowski/xla"
+  # Don't include `www.` in the URL
+  # Should be formatted as: "https://github.com/..."
+  github_repo_url = "https://github.com/mbzomowski/xla"
 }
