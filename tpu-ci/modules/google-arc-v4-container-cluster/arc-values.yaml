@@ -1,15 +1,13 @@
-githubConfigUrl: "https://github.com/mbzomowski/xla"
+githubConfigUrl: var.github_repo_url
 githubConfigSecret: github-pat
 minRunners: 0
-maxRunners: 1
+maxRunners: var.max_tpu_nodes
 template:
   spec:
     containers:
     - name: runner
       image: gcr.io/tpu-pytorch/bzmarke-image:latest
       command: ["/home/runner/run.sh"]
-        #securityContext:
-        #privileged: true
       resources:
         limits:
           google.com/tpu: 4
