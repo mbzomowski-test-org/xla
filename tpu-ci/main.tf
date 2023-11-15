@@ -16,4 +16,6 @@ module "v4_arc_cluster" {
   # Don't include `www.` in the URL
   # Should be formatted as: "https://github.com/..."
   github_repo_url = "https://github.com/mbzomowski/xla"
+
+  runner_image =  "gcr.io/tpu-pytorch/bzmarke-image:latest"
 }

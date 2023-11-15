@@ -44,3 +44,8 @@ variable "project_id" {
   description = "The project ID"
   type = string
 }
+
+variable "runner_image" {
+  description = "The Docker image used in the self-hosted runner"
+  type = string
+}

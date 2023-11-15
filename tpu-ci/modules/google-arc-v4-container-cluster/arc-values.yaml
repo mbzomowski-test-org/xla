@@ -6,7 +6,7 @@ template:
   spec:
     containers:
     - name: runner
-      image: gcr.io/tpu-pytorch/bzmarke-image:latest
+      image: ${runner_image}
       command: ["/home/runner/run.sh"]
       resources:
         limits:
