@@ -1,6 +1,7 @@
 name: TPU Test
 run-name: CI Testing
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
   schedule:
     - cron: '0 16,20,0 * * 1-5'
 jobs:
