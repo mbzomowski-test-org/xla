@@ -1,6 +1,6 @@
-# Terraform setup for TPU CI for PyTorch/XLA
+# Cluster creation for TPU CI for PyTorch/XLA
 
-This setup configures:
+This module configures:
 * A regional GKE cluster
 * A CPU node pool
 * An autoscaling v4 TPU node pool

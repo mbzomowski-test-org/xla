@@ -9,9 +9,6 @@ torch_xla/csrc/version.cpp
 *.swp
 *.pyc
 *.so
-*.tfvars
-*.tfstate
-*.tfstate.*
 
 # BEGIN NOT-CLEAN-FILES (setup.py handles this marker. Do not change.)
 #
