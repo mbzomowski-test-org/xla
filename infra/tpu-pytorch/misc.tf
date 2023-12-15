@@ -11,7 +11,7 @@ module "docker_registry" {
 # Storage bucket for Terraform state of this project.
 module "tfstate_storage_bucket" {
   source = "../terraform_modules/storage_bucket"
-  name   = "tpu-pytorch-tfstate"
+  name   = "bzmarke-tfstate"
 }
 
 # Private worker pool for Cloud Builds.

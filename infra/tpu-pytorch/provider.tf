@@ -14,7 +14,7 @@ terraform {
 
   backend "gcs" {
     # Make sure that bucket name matches the only specified in ./misc.tf.
-    bucket = "tpu-pytorch-tfstate"
+    bucket = "bzmarke-tfstate"
     prefix = "terraform/state"
   }
 }
