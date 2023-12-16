@@ -8,14 +8,17 @@ jobs:
   tpu-test:
     runs-on: v4-runner-set
     steps:
-      - name: Checkout PyTorch/XLA Repo
-        uses: actions/checkout@v4
       - name: Checkout PyTorch Repo
         run: |
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          python3 setup.py install --user
-          cp -r $GITHUB_WORKSPACE/pytorch/xla .
+          # python3 setup.py install --user
+          # cp -r $GITHUB_WORKSPACE/pytorch/xla .
+      - name: Checkout PyTorch/XLA Repo
+        uses: actions/checkout@v4
+        run: |
+          pwd
+          ls
       - name: Run PyTorch/XLA Setup
         env:
           BAZEL_VERBOSE: 1
