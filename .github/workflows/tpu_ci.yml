@@ -16,15 +16,14 @@ jobs:
           # cp -r $GITHUB_WORKSPACE/pytorch/xla .
       - name: Checkout PyTorch/XLA Repo
         uses: actions/checkout@v4
-        run: |
-          pwd
-          ls
       - name: Run PyTorch/XLA Setup
         env:
           BAZEL_VERBOSE: 1
           BUNDLE_LIBTPU: 1
           TPUVM_MODE: 1
         run: |
+          pwd
+          ls
           cd pytorch/xla
           python3 setup.py install --user
       - name: Run Tests
