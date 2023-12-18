@@ -15,11 +15,10 @@ jobs:
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           # python3 setup.py install --user
-          # cp -r $GITHUB_WORKSPACE/pytorch/xla .
       - name: Checkout PyTorch/XLA Repo
         uses: actions/checkout@v4
         with:
-          path: pytorch
+          path: pytorch/xla
       - name: Run PyTorch/XLA Setup
         env:
           BAZEL_VERBOSE: 1
@@ -28,6 +27,8 @@ jobs:
         run: |
           pwd
           ls
+          ls pytorch
+          ls pytorch/xla
           cd pytorch/xla
           python3 setup.py install --user
       - name: Run Tests
