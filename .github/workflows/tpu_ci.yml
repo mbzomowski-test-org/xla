@@ -18,6 +18,8 @@ jobs:
           # cp -r $GITHUB_WORKSPACE/pytorch/xla .
       - name: Checkout PyTorch/XLA Repo
         uses: actions/checkout@v4
+        with:
+          path: $GITHUB_WORKSPACE/pytorch
       - name: Run PyTorch/XLA Setup
         env:
           BAZEL_VERBOSE: 1
