@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout PyTorch Repo
         run: |
+          pwd
+          ls
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
           # python3 setup.py install --user
