@@ -10,11 +10,9 @@ jobs:
     steps:
       - name: Checkout PyTorch Repo
         run: |
-          pwd
-          ls
           git clone --recursive https://github.com/pytorch/pytorch
           cd pytorch/
-          # python3 setup.py install --user
+          python3 setup.py install --user
       - name: Checkout PyTorch/XLA Repo
         uses: actions/checkout@v4
         with:
@@ -25,10 +23,6 @@ jobs:
           BUNDLE_LIBTPU: 1
           TPUVM_MODE: 1
         run: |
-          pwd
-          ls
-          ls pytorch
-          ls pytorch/xla
           cd pytorch/xla
           python3 setup.py install --user
       - name: Run Tests
