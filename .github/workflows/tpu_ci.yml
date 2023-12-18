@@ -19,7 +19,7 @@ jobs:
       - name: Checkout PyTorch/XLA Repo
         uses: actions/checkout@v4
         with:
-          path: $GITHUB_WORKSPACE/pytorch
+          path: pytorch
       - name: Run PyTorch/XLA Setup
         env:
           BAZEL_VERBOSE: 1
